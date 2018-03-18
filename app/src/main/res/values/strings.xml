@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">Crypto Converter</string>
+    <string name="title_converter">Converter</string>
+    <string name="title_market">Coins</string>
+    <string name="title_settings">Settings</string>
+    <string name="credits">
+        Icons - \nhttps://www.flaticon.com\n\nAPI - \nhttps://www.cryptocompare.com\nhttps://www.blockcypher.com
+    </string>
+
+    <string name="select_currency_dialog_title">Select currency</string>
+
+    <!--paper wallet addresses!-->
+    <string name="bitcoin_address">1LnHWzy3sDttuPVHLQKrUyx3AasFo3ijyM</string>
+    <string name="eth_address">0x824Ac06208eFA740B91FBD75cE03Ef15790cA90E</string>
+    <string name="lite_address">LNVHbZPLgVMxjM4SFUzTsCpGJEWGUuphyx</string>
+    <string name="ripple_address">rGXUvxM2cTWkXCdAUFgexWwYuc546BBhgD</string>
+
+
+    <!--currencies !-->
+    <string-array name="currencies">
+        <item>USD</item>
+        <item>EUR</item>
+        <item>CNY</item>
+        <item>GBP</item>
+        <item>JPY</item>
+        <item>PLN</item>
+        <item>RUB</item>
+        <item>SGD</item>
+        <item>AUD</item>
+        <item>HKD</item>
+        <item>CHF</item>
+        <item>INR</item>
+        <item>NZD</item>
+        <item>BRL</item>
+        <item>SEK</item>
+        <item>PHP</item>
+        <item>THB</item>
+        <item>VND</item>
+        <item>CZK</item>
+        <item>ZAR</item>
+        <item>KWD</item>
+        <item>ZMW</item>
+        <item>AED</item>
+        <item>KRW</item>
+        <item>CUC</item>
+
+
+        <!--
+        <item>KHR</item>
+        <item>TRY</item>
+        <item>BHD</item>
+        <item>RUR</item>
+        <item>BGN</item>
+        <item>IRR</item>
+        <item>KES</item>
+        <item>GHS</item>
+        <item>DOP</item>
+        <item>OMR</item>
+        <item>PYG</item>
+
+
+        <item>DZD</item>
+        <item>CUC</item>
+        <item>ZMW</item>
+        <item>AMD</item>
+        <item>TND</item>
+        <item>NAD</item>
+        <item>VUV</item>
+        <item>QAR</item>
+        <item>DASH</item>
+        <item>BYN</item>
+        <item>GEL</item>
+        <item>EGP</item>
+
+         <item>AZN</item>
+
+!-->
+
+
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>

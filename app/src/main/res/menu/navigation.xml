@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_converter"
+        android:icon="@drawable/ic_wallet"
+        android:title="@string/title_converter" />
+
+    <item
+        android:id="@+id/navigation_market"
+        android:icon="@drawable/ic_coins"
+        android:title="@string/title_market" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/title_settings" />
+
+</menu>
