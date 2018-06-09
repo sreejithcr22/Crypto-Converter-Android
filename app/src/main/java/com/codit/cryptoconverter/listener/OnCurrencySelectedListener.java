@@ -9,5 +9,5 @@ import com.codit.cryptoconverter.model.SpinnerItem;
  */
 
 public interface OnCurrencySelectedListener {
-    void onCurrencySelected(SpinnerItem item);
+    void onCurrencySelected(SpinnerItem item, int textViewId);
 }

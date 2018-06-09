@@ -3,6 +3,7 @@ package com.codit.cryptoconverter.fragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import com.codit.cryptoconverter.listener.OnCurrencySelectedListener;
 import com.codit.cryptoconverter.listener.OnSpinnerItemClickListener;
 import com.codit.cryptoconverter.model.SpinnerItem;
 import com.codit.cryptoconverter.util.Coin;
+import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.Currency;
 
 import java.util.ArrayList;
@@ -33,13 +35,14 @@ public class SpinnerDialog extends DialogFragment {
 
     private static final String TAG = "search";
     private OnCurrencySelectedListener onCurrencySelectedListener ;
+    private int currentSelectedLabelId = -1;
     private OnSpinnerItemClickListener onSpinnerItemClickListener = new OnSpinnerItemClickListener() {
         @Override
         public void onSpinnerItemClick(SpinnerItem item) {
             Log.d(TAG, "onSpinnerItemClick: "+item.getCurrencyName());
             if(getDialog()!=null) {
                 if(onCurrencySelectedListener != null) {
-                    onCurrencySelectedListener.onCurrencySelected(item);
+                    onCurrencySelectedListener.onCurrencySelected(item, currentSelectedLabelId);
                 }
                 getDialog().dismiss();
             }
@@ -52,6 +55,10 @@ public class SpinnerDialog extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        onCurrencySelectedListener = (OnCurrencySelectedListener) getActivity();
+       Bundle args = getArguments();
+       if(args != null) {
+           currentSelectedLabelId = args.getInt(Constants.EXTRA_CURRENCY_TEXTVIEW_ID,-1);
+       }
     }
 
 
@@ -95,7 +102,15 @@ public class SpinnerDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.select_currency_dialog_title))
-                .setView(view);
+                .setView(view)
+                .setPositiveButton(R.string.currency_selector_dialog_cancel_btn_text, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (getDialog()!=null) {
+                            getDialog().dismiss();
+                        }
+                    }
+                });
 
 
         return builder.create();

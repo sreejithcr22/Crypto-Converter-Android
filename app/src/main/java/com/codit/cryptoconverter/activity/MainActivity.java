@@ -177,10 +177,10 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
     }
 
     @Override
-    public void onCurrencySelected(SpinnerItem item) {
+    public void onCurrencySelected(SpinnerItem item, int textViewId) {
         ConverterFragment converterFragment = (ConverterFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_CONVERTER);
         if (converterFragment != null) {
-            converterFragment.updateCurrencySelection(item);
+            converterFragment.updateCurrencySelection(item, textViewId);
         }
     }
 
