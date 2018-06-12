@@ -30,7 +30,6 @@
         <item>HKD</item>
         <item>CHF</item>
         <item>INR</item>
-        <item>NZD</item>
         <item>BRL</item>
         <item>SEK</item>
         <item>PHP</item>
@@ -42,7 +41,6 @@
         <item>ZMW</item>
         <item>AED</item>
         <item>KRW</item>
-        <item>CUC</item>
 
 
         <!--
@@ -84,8 +82,10 @@
     <string name="generic_error_message">Sorry, something went wrong !</string>
     <string name="same_currency_value">Currency values cannot be the same !</string>
 
+
     <string name="currency_selector_dialog_cancel_btn_text">Cancel</string>
     <string name="err_divide_by_zero">Can\'t divide by zero</string>
+    <string name="err_data_na">Data not available</string>
 
     <item type="id" name="IS_CURRENT_SELECTED_FIELD"/>
     <item type="id" name="TAG_CURRENT_OP"/>

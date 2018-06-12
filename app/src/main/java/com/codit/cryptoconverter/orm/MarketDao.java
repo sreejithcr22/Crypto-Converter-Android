@@ -19,10 +19,14 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 public interface MarketDao {
 
     @Query("Select * from CoinPrices")
-    LiveData<List<CoinPrices>> getAllCoinPrices();
+    LiveData<List<CoinPrices>> getAllCoinPricesLive();
+
+    @Query("Select * from CoinPrices")
+    List<CoinPrices> getAllCoinPrices();
 
     @Query("Select * from CoinPrices where coinCode=:coinCode")
     CoinPrices getCoinPricesFor(String coinCode);
+
 
     @Insert(onConflict = REPLACE)
     void addCoinPrices(List<CoinPrices> prices);

@@ -42,11 +42,6 @@ public class App extends Application {
     }
 
     private void setUpAlarm() {
-
-        /*Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-        PendingIntent pintent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5*60*1000, pintent);*/
         Intent intent = new Intent(this, ScheduleAlarm.class);
         sendBroadcast(intent);
     }

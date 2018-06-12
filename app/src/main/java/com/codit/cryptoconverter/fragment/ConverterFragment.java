@@ -50,7 +50,7 @@ public class ConverterFragment extends Fragment {
             if (edit1 != null && edit2 != null) {
                 //rest selection indicator and tags
                 printResult();
-                operatorOn = false;
+
 
                 edit1.setBackgroundColor(Color.TRANSPARENT);
                 edit2.setBackgroundColor(Color.TRANSPARENT);
@@ -79,13 +79,13 @@ public class ConverterFragment extends Fragment {
             }
 
             //check if current selected filed is in error state
-            if(currentSelectedField.getText().toString().equals(getResources().getString(R.string.err_divide_by_zero))) {
+            if(isInErrorState(currentSelectedField)) {
                 Log.d(TAG, "onCalcDigitButtonClickListener: current selected field in error state");
                 return;
             }
 
             //check if in error state and if true accept only decimal point input
-                if(outputField.getText().toString().equals(getResources().getString(R.string.err_divide_by_zero))
+                if(isInErrorState(outputField)
                         && !(value2.toString().contains(String.valueOf(Calculator.INPUT_DECIMAL_POINT))) ) {
                     Log.d(TAG, "onCalcDigitButtonClickListener: error state and no decimal found, returning");
                     return;
@@ -283,7 +283,7 @@ public class ConverterFragment extends Fragment {
 
     public void updateCurrencySelection(SpinnerItem item, int textViewId) {
         Log.d(TAG, "updateCurrencySelection: " + item.getCurrencyName());
-
+        boolean isCurrencyUpdated = false;
         if (textViewId == -1) {
             Toast.makeText(getActivity(), getString(R.string.generic_error_message), Toast.LENGTH_SHORT).show();
             return;
@@ -294,14 +294,24 @@ public class ConverterFragment extends Fragment {
                 Toast.makeText(getActivity(), getString(R.string.same_currency_value), Toast.LENGTH_SHORT).show();
             } else {
                 currency1.setText(item.getCurrencyCode());
+                isCurrencyUpdated = true;
             }
         } else {
             if (currency1.getText().toString().equals(item.getCurrencyCode())) {
                 Toast.makeText(getActivity(), getString(R.string.same_currency_value), Toast.LENGTH_SHORT).show();
             } else {
                 currency2.setText(item.getCurrencyCode());
+                isCurrencyUpdated = true;
             }
         }
+
+        //currency changed, re-convert and display
+        if (isCurrencyUpdated) {
+            printResult();
+            updateValues();
+            updateOutput(getOutputField(),result);
+        }
+
     }
 
     private String getConvertFromCurrency() {
@@ -351,24 +361,6 @@ public class ConverterFragment extends Fragment {
         }
     }
 
-    private BigDecimal convert(String convertFromCurrency, String convertToCurrency, BigDecimal value) {
-        if(convertFromCurrency!=null && convertFromCurrency!=null) {
-            Log.d(TAG, "convert: from-"+convertFromCurrency+", To-"+convertToCurrency);
-
-            //get currency values from db
-            MarketDao marketDao = AppDatabase.getDatabase(getContext().getApplicationContext()).marketDao();
-            if(marketDao!=null) {
-                CoinPrices prices = marketDao.getCoinPricesFor(convertFromCurrency);
-                Double toPrice = prices.getPrices().get(convertToCurrency);
-                Log.d(TAG, "convert: toPrice = "+String.valueOf(toPrice));
-            }
-
-        }
-
-        Log.d(TAG, "convert: error--from-"+convertFromCurrency+", To-"+convertToCurrency);
-        return null;
-    }
-
     private void printResult() {
         TextView currentSelectedField = getCurrentSelectedField();
         if(currentSelectedField != null && result!=null) {
@@ -377,6 +369,7 @@ public class ConverterFragment extends Fragment {
     }
 
     private void updateValues() {
+        operatorOn = false;
         TextView currentSelectedField = getCurrentSelectedField();
         if (!isInErrorState(currentSelectedField) && !currentSelectedField.getText().toString().isEmpty()) {
             try {

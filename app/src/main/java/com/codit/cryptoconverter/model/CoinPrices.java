@@ -34,6 +34,11 @@ public class CoinPrices {
     }
 
     @Ignore
+    public void setPrices(HashMap<String, Double> pricesMap) {
+        this.jsonPricesString = new Gson().toJson(pricesMap);
+    }
+
+    @Ignore
     HashMap<String,Double> prices;
 
     public CoinPrices(String coinCode, HashMap<String,Double> prices) {

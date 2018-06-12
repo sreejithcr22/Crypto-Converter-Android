@@ -2,6 +2,7 @@ package com.codit.cryptoconverter.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Looper;
 import android.util.Log;
 
 import com.codit.cryptoconverter.R;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -25,6 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class FetchMarketDataService extends IntentService {
+    private static final String TAG = "FetchMarketDataService";
 
 
     public FetchMarketDataService() {
@@ -36,17 +39,29 @@ public class FetchMarketDataService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             Log.d("wallet", "fetch: ");
-            updateDB(fetchDataFromServer());
+            updateDB(fetchDataFromServer(false));
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            updateDB(fetchDataFromServer(true));
         }
     }
 
-    LinkedHashMap<String, HashMap<String, Double>>  fetchDataFromServer()
+     LinkedHashMap<String, HashMap<String, Double>>  fetchDataFromServer(boolean isCurrencyLimited)
     {
         Retrofit retrofit= ApiClient.getInstance().getMarketClient();
         MarketApi marketApi=retrofit.create(MarketApi.class);
+        Call<LinkedHashMap<String,HashMap<String,Double> >> call;
 
-        Call<LinkedHashMap<String,HashMap<String,Double> >> call=marketApi.getAllCoinPrices(UrlBuilder.buildCoinList(),
-                UrlBuilder.buildCurrencyList(getApplicationContext().getResources().getStringArray(R.array.currencies)));
+        if(isCurrencyLimited) {
+            call=marketApi.getAllCoinPrices(UrlBuilder.buildCoinList(false),
+                    UrlBuilder.buildCoinList(true));
+        }
+        else {
+            call = marketApi.getAllCoinPrices(UrlBuilder.buildCoinList(false),
+                    UrlBuilder.buildCurrencyList(getApplicationContext().getResources().getStringArray(R.array.currencies))); }
         try {
 
             Response<LinkedHashMap<String, HashMap<String, Double>>> response=call.execute();
@@ -64,18 +79,42 @@ public class FetchMarketDataService extends IntentService {
         }
     }
 
-    void updateDB(LinkedHashMap<String, HashMap<String, Double>> prices)
+    void updateDB(LinkedHashMap<String, HashMap<String, Double>> fetchedPricesList)
     {
-        if(prices==null) return;
-        List<CoinPrices> coinPricesList=new ArrayList<>();
-        for(Map.Entry<String, HashMap<String, Double>> entry : prices.entrySet()) {
-            coinPricesList.add(new CoinPrices(entry.getKey(),entry.getValue()));
+        if(fetchedPricesList==null) return;
+
+        MarketDao dao= AppDatabase.getDatabase(getApplicationContext()).marketDao();
+        List<CoinPrices> dbPricesList = dao.getAllCoinPrices();
+        if(dbPricesList!= null && dbPricesList.size()>0) {
+            Log.d(TAG, "updateDB:getAllCoinPrices returned values ");
+            for (CoinPrices dbPrices: dbPricesList) {
+                Log.d(TAG, "updateDB: before update--"+dbPrices.getCoinCode()+"--"+dbPrices.getJsonPricesString());
+                HashMap<String, Double> dbPricesMap = dbPrices.getPrices();
+                if (dbPricesMap!=null && fetchedPricesList.containsKey(dbPrices.getCoinCode()) && fetchedPricesList.get(dbPrices.getCoinCode())!=null) {
+                    HashMap<String, Double> fetchedPricesMap = fetchedPricesList.get(dbPrices.getCoinCode());
+                    dbPricesMap.putAll(fetchedPricesMap);
+                    dbPrices.setPrices(dbPricesMap);
+                    Log.d(TAG, "updateDB: after update--"+dbPrices.getCoinCode()+"--"+dbPrices.getJsonPricesString());
+                }
+                else {
+                    Log.d(TAG, "updateDB: some null");
+                }
+
+            }
+
+            dao.addCoinPrices(dbPricesList);
+
+        } else {
+            Log.d(TAG, "updateDB:getAllCoinPrices returned null ");
+            List<CoinPrices> coinPricesList=new ArrayList<>();
+            for(Map.Entry<String, HashMap<String, Double>> entry : fetchedPricesList.entrySet()) {
+                coinPricesList.add(new CoinPrices(entry.getKey(),entry.getValue()));
+                dao.addCoinPrices(coinPricesList);
+        }
+
+
 
         }
-        MarketDao dao= AppDatabase.getDatabase(getApplicationContext()).marketDao();
-        dao.addCoinPrices(coinPricesList);
-
-
 
 
     }

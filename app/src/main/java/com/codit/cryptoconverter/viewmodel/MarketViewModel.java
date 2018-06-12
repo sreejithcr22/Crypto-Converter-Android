@@ -31,7 +31,7 @@ public class MarketViewModel extends AndroidViewModel {
 
         appDatabase = AppDatabase.getDatabase(this.getApplication());
 
-        allCoinPrices = appDatabase.marketDao().getAllCoinPrices();
+        allCoinPrices = appDatabase.marketDao().getAllCoinPricesLive();
 
 
     }

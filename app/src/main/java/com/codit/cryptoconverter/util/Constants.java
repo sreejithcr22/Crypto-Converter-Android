@@ -9,4 +9,5 @@ public final class Constants {
     public static final String GENERIC_ERROR_MESSAGE = "Sorry, something went wrong !";
     public static final String CURRENCY1_DEFAULT_VALUE = "BTC";
     public static final String CURRENCY2_DEFAULT_VALUE = "USD";
+    public static final int API_CURRENCY_ARG_LIMIT = 24;
 }
