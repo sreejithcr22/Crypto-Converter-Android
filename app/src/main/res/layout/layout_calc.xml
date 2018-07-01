@@ -17,6 +17,45 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:background="@android:color/background_dark">
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight=".5"
+            android:layout_width="match_parent"
+            android:background="@drawable/calc_button_selector"
+            android:layout_height="0dp">
+
+            <ImageButton
+                android:id="@+id/btn_add_fav"
+                android:background="@drawable/calc_button_selector"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:id="@+id/view_favs"
+                android:background="@drawable/calc_button_selector"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:id="@+id/paste_clipboard"
+                android:background="@drawable/calc_button_selector"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:background="@drawable/calc_button_selector"
+
+                android:id="@+id/btn_refresh"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_weight="3.5"
@@ -28,6 +67,7 @@
 
             <!--number parent ..has 3 vertical layouts !-->
 
+
             <LinearLayout
 
                 android:layout_marginLeft="2dp"
@@ -38,6 +78,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent">
 
+
                 <!--row 1 !-->
 
                 <LinearLayout
@@ -46,29 +87,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp">
 
+
                     <Button
                         android:textColor="@android:color/white"
                         android:textSize="20sp"
                         android:id="@+id/clear"
-                        android:text="C"
+                        android:text="AC"
 
                         android:background="@drawable/calc_button_selector"
-                        android:layout_weight="1"
+                        android:layout_weight="2"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         />
-
-                    <Button
-                        android:text="+/-"
-                        android:textColor="@android:color/white"
-                        android:textSize="20sp"
-
-                        android:background="@drawable/calc_button_selector"
-                        android:id="@+id/negate"
-                        android:tint="@android:color/white"
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent" />
 
                     <ImageButton
                         android:id="@+id/backspace"

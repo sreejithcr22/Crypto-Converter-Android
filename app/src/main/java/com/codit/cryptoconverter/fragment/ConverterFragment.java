@@ -9,16 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.asynctask.ConvertAndDisplay;
 import com.codit.cryptoconverter.asynctask.ConvertAndDisplayParams;
-import com.codit.cryptoconverter.model.CoinPrices;
+import com.codit.cryptoconverter.model.CalculatorParams;
 import com.codit.cryptoconverter.model.SpinnerItem;
-import com.codit.cryptoconverter.orm.AppDatabase;
-import com.codit.cryptoconverter.orm.MarketDao;
 import com.codit.cryptoconverter.util.Calculator;
 import com.codit.cryptoconverter.util.Constants;
 
@@ -33,6 +32,7 @@ public class ConverterFragment extends Fragment {
     private BigDecimal result = null;
     private Button no0, no1, no2, no3, no4, no5, no6, no7, no8, no9,
             opAdd, opSub, opDiv, opEquals, opMultiply, numDot, opClear;
+    private ImageButton opBackSpace, btnAddFav;
     private View.OnClickListener onCurrencyTextviewClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -46,6 +46,9 @@ public class ConverterFragment extends Fragment {
     private View.OnClickListener onValueFieldClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
+            if (getCurrentSelectedField() != null && getCurrentSelectedField().getId() == v.getId())
+                return;
 
             if (edit1 != null && edit2 != null) {
                 //rest selection indicator and tags
@@ -62,9 +65,17 @@ public class ConverterFragment extends Fragment {
             v.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             v.setTag(R.id.IS_CURRENT_SELECTED_FIELD, true);
 
-            updateValues();
+            updateCalcParams();
         }
     };
+
+    private View.OnClickListener onClearButtonClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            clearFields();
+        }
+    };
+
     private View.OnClickListener onCalcDigitButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -73,72 +84,71 @@ public class ConverterFragment extends Fragment {
             String currentOperator;
             String inputValue = ((Button) v).getText().toString();
 
-            if(currentSelectedField==null || outputField==null) {
+            if (currentSelectedField == null || outputField == null) {
                 Log.d(TAG, "onCalcDigitButtonClickListener: field null, returning");
                 return;
             }
 
             //check if current selected filed is in error state
-            if(isInErrorState(currentSelectedField)) {
+            if (isInErrorState(currentSelectedField)) {
                 Log.d(TAG, "onCalcDigitButtonClickListener: current selected field in error state");
                 return;
             }
 
             //check if in error state and if true accept only decimal point input
-                if(isInErrorState(outputField)
-                        && !(value2.toString().contains(String.valueOf(Calculator.INPUT_DECIMAL_POINT))) ) {
-                    Log.d(TAG, "onCalcDigitButtonClickListener: error state and no decimal found, returning");
+            if (isInErrorState(outputField)
+                    && !(value2.toString().contains(String.valueOf(Calculator.INPUT_DECIMAL_POINT)))) {
+                Log.d(TAG, "onCalcDigitButtonClickListener: error state and no decimal found, returning");
+                return;
+            }
+
+            currentOperator = currentSelectedField.getTag(R.id.TAG_CURRENT_OP) == null ? null : String.valueOf(currentSelectedField.getTag(R.id.TAG_CURRENT_OP));
+
+            if (currentSelectedField != null && outputField != null) {
+
+                if ((inputValue.equals(String.valueOf(Calculator.INPUT_DECIMAL_POINT)))
+                        && ((currentOperator == null && currentSelectedField.getText().toString().contains(String.valueOf(Calculator.INPUT_DECIMAL_POINT)))
+                        || (currentOperator != null && value2.toString().contains(String.valueOf(Calculator.INPUT_DECIMAL_POINT))))) {
+                    Log.d(TAG, "onClick: . found returning");
                     return;
                 }
 
-                currentOperator = currentSelectedField.getTag(R.id.TAG_CURRENT_OP) == null ? null : String.valueOf(currentSelectedField.getTag(R.id.TAG_CURRENT_OP));
-
-                if (currentSelectedField != null && outputField != null) {
-
-                   if ((inputValue.equals(String.valueOf(Calculator.INPUT_DECIMAL_POINT)))
-                           && ((currentOperator==null && currentSelectedField.getText().toString().contains(String.valueOf(Calculator.INPUT_DECIMAL_POINT)))
-                           || (currentOperator!=null && value2.toString().contains(String.valueOf(Calculator.INPUT_DECIMAL_POINT)))))
-                   {
-                       Log.d(TAG, "onClick: . found returning");
-                       return;
-                   }
-
-                   //if input value is '.' prefix it with '0' and make it '0.'
-                    // so that Bigdecimal initialization does not throw exception
-                   if(inputValue.equals(String.valueOf(Calculator.INPUT_DECIMAL_POINT))&& (currentSelectedField.getText().toString().isEmpty() || (currentOperator!=null && value2.toString().isEmpty()) )) {
-                       inputValue = "0.";
-                       Log.d(TAG, "onClick: inputValue = 0.");
-                   }
-
-                    currentSelectedField.append(inputValue);
-                    operatorOn = false;
-
-                    //calculate result
-                    if (currentOperator != null) {
-                        value2 = value2.append(inputValue);
-                        if(!value2.toString().equals("0.")) { //by pass calculation if value 2 is '0.'
-                            try {
-                                result = Calculator.calculate(value1.toString(), value2.toString(), currentOperator);
-                                updateOutput(outputField, result);
-                            } catch (ArithmeticException e) {
-                                Log.d(TAG, "caught : "+e.getMessage());
-                                if(e.getMessage().equals(Calculator.EXCEPTION_DIVIDE_BY_ZERO)) {
-                                    updateOutput(outputField,getResources().getString(R.string.err_divide_by_zero));
-                                }
-                            }
-
-                        }
-                    } else {
-                        value1 = new StringBuffer(currentSelectedField.getText().toString());
-                        result = new BigDecimal(value1.toString());
-                        updateOutput(outputField, result);
-                    }
-                    Log.d(TAG, "current op= " + currentOperator + " val1= " + String.valueOf(value1) + " , val2= " + String.valueOf(value2) + ", result= " + String.valueOf(result));
-
-
+                //if input value is '.' prefix it with '0' and make it '0.'
+                // so that Bigdecimal initialization does not throw exception
+                if (inputValue.equals(String.valueOf(Calculator.INPUT_DECIMAL_POINT)) && (currentSelectedField.getText().toString().isEmpty() || (currentOperator != null && value2.toString().isEmpty()))) {
+                    inputValue = "0.";
+                    Log.d(TAG, "onClick: inputValue = 0.");
                 }
+
+                currentSelectedField.append(inputValue);
+                operatorOn = false;
+
+                //calculate result
+                if (currentOperator != null) {
+                    value2 = value2.append(inputValue);
+                    if (!value2.toString().equals("0.")) { //by pass calculation if value 2 is '0.'
+                        try {
+                            result = Calculator.calculate(value1.toString(), value2.toString(), currentOperator);
+                            updateOutput(outputField, result);
+                        } catch (ArithmeticException e) {
+                            Log.d(TAG, "caught : " + e.getMessage());
+                            if (e.getMessage().equals(Calculator.EXCEPTION_DIVIDE_BY_ZERO)) {
+                                updateOutput(outputField, getResources().getString(R.string.err_divide_by_zero));
+                            }
+                        }
+
+                    }
+                } else {
+                    value1 = new StringBuffer(currentSelectedField.getText().toString());
+                    result = new BigDecimal(value1.toString());
+                    updateOutput(outputField, result);
+                }
+                Log.d(TAG, "current op= " + currentOperator + " val1= " + String.valueOf(value1) + " , val2= " + String.valueOf(value2) + ", result= " + String.valueOf(result));
+
+
             }
-        };
+        }
+    };
 
     private View.OnClickListener onOperationClickListener = new View.OnClickListener() {
         @Override
@@ -147,7 +157,7 @@ public class ConverterFragment extends Fragment {
             TextView outputField = getOutputField();
 
             //check if in error state and return
-            if(isInErrorState(outputField) || isInErrorState(currentSelectedField)) {
+            if (isInErrorState(outputField) || isInErrorState(currentSelectedField)) {
                 Log.d(TAG, "onOperationClickListener: error state, returning");
                 return;
             }
@@ -189,6 +199,24 @@ public class ConverterFragment extends Fragment {
         }
     };
 
+    private View.OnClickListener onBackspaceListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            onBackSpaceClick();
+        }
+    };
+
+    private View.OnClickListener onOpEqualsClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            printResult();
+            updateCalcParams();
+        }
+    };
+
+
+
+
     public ConverterFragment() {
         // Required empty public constructor
     }
@@ -205,8 +233,8 @@ public class ConverterFragment extends Fragment {
         edit1.setOnClickListener(onValueFieldClickListener);
         edit2.setOnClickListener(onValueFieldClickListener);
 
-        edit1.setTag(R.id.IS_CURRENT_SELECTED_FIELD,false);
-        edit2.setTag(R.id.IS_CURRENT_SELECTED_FIELD,false);
+        edit1.setTag(R.id.IS_CURRENT_SELECTED_FIELD, false);
+        edit2.setTag(R.id.IS_CURRENT_SELECTED_FIELD, false);
 
         edit1.callOnClick();
 
@@ -233,6 +261,9 @@ public class ConverterFragment extends Fragment {
         opMultiply = view.findViewById(R.id.opMultiply);
         opSub = view.findViewById(R.id.opSub);
         opDiv = view.findViewById(R.id.opDiv);
+        opBackSpace = view.findViewById(R.id.backspace);
+        opClear = view.findViewById(R.id.clear);
+        opEquals = view.findViewById(R.id.opEquals);
 
         no0.setOnClickListener(onCalcDigitButtonClickListener);
         no1.setOnClickListener(onCalcDigitButtonClickListener);
@@ -250,6 +281,9 @@ public class ConverterFragment extends Fragment {
         opSub.setOnClickListener(onOperationClickListener);
         opMultiply.setOnClickListener(onOperationClickListener);
         opDiv.setOnClickListener(onOperationClickListener);
+        opBackSpace.setOnClickListener(onBackspaceListener);
+        opClear.setOnClickListener(onClearButtonClickListener);
+        opEquals.setOnClickListener(onOpEqualsClickListener);
 
 
         return view;
@@ -308,8 +342,8 @@ public class ConverterFragment extends Fragment {
         //currency changed, re-convert and display
         if (isCurrencyUpdated) {
             printResult();
-            updateValues();
-            updateOutput(getOutputField(),result);
+            updateCalcParams();
+            updateOutput(getOutputField(), result);
         }
 
     }
@@ -317,11 +351,10 @@ public class ConverterFragment extends Fragment {
     private String getConvertFromCurrency() {
 
         TextView currentSelectedFiled = getCurrentSelectedField();
-        if(currentSelectedFiled!=null) {
-            if(currentSelectedFiled.getId() == R.id.edit1) {
+        if (currentSelectedFiled != null) {
+            if (currentSelectedFiled.getId() == R.id.edit1) {
                 return currency1.getText().toString();
-            }
-            else if(currentSelectedFiled.getId() == R.id.edit2) {
+            } else if (currentSelectedFiled.getId() == R.id.edit2) {
                 return currency2.getText().toString();
             }
         }
@@ -331,11 +364,10 @@ public class ConverterFragment extends Fragment {
     private String getConvertToCurrency() {
 
         TextView outputField = getOutputField();
-        if(outputField!=null) {
+        if (outputField != null) {
             if (outputField.getId() == R.id.edit1) {
                 return currency1.getText().toString();
-            }
-            else if(outputField.getId() == R.id.edit2) {
+            } else if (outputField.getId() == R.id.edit2) {
                 return currency2.getText().toString();
             }
         }
@@ -348,48 +380,105 @@ public class ConverterFragment extends Fragment {
             //convert
             /*BigDecimal result = convert(getConvertFromCurrency(), getConvertToCurrency(), convertFromValue);*/
             //outputField.setText(convertFromValue.toPlainString());
-            ConvertAndDisplay task = new ConvertAndDisplay(getContext().getApplicationContext(),outputField);
-            task.execute(new ConvertAndDisplayParams(getConvertFromCurrency(),getConvertToCurrency(),convertFromValue));
+            ConvertAndDisplay task = new ConvertAndDisplay(getContext().getApplicationContext(), outputField);
+            task.execute(new ConvertAndDisplayParams(getConvertFromCurrency(), getConvertToCurrency(), convertFromValue));
 
-            }
+        }
     }
 
     private void updateOutput(TextView outputField, String errorMessage) {
-        if (outputField!=null) {
-            Log.d(TAG, "updateOutput: "+errorMessage);
+        if (outputField != null) {
+            Log.d(TAG, "updateOutput: " + errorMessage);
             outputField.setText(errorMessage);
         }
     }
 
     private void printResult() {
         TextView currentSelectedField = getCurrentSelectedField();
-        if(currentSelectedField != null && result!=null) {
+        if (!isInErrorState(currentSelectedField) && result != null) {
             currentSelectedField.setText(result.toPlainString());
         }
     }
 
-    private void updateValues() {
+    private void updateCalcParams() {
         operatorOn = false;
         TextView currentSelectedField = getCurrentSelectedField();
-        if (!isInErrorState(currentSelectedField) && !currentSelectedField.getText().toString().isEmpty()) {
-            try {
+
+        try {
+            if (isInErrorState(currentSelectedField)) return;
+
+            currentSelectedField.setTag(R.id.TAG_CURRENT_OP, null);
+            if (!currentSelectedField.getText().toString().isEmpty()) {
+
                 value1 = new StringBuffer(currentSelectedField.getText().toString());
                 result = new BigDecimal(currentSelectedField.getText().toString());
                 value2 = new StringBuffer();
-                currentSelectedField.setTag(R.id.TAG_CURRENT_OP,null);
 
-            } catch (Exception e) {
-                Log.d(TAG, "updateValues: exception--"+e.getMessage());
-                e.printStackTrace();
+            } else {
+                value1 = new StringBuffer();
+                result = null;
+                value2 = new StringBuffer();
+
             }
+
+
+        } catch (Exception e) {
+            Log.d(TAG, "updateCalcParams: exception--" + e.getMessage());
+            e.printStackTrace();
         }
     }
 
+    private void updateCalcParams(CalculatorParams params) {
+        TextView currentSelectedField = getCurrentSelectedField();
+        if (currentSelectedField == null) return;
+        operatorOn = params.isOperatorOn();
+        currentSelectedField.setTag(R.id.TAG_CURRENT_OP, params.getOperator());
+        value1 = params.getVal1();
+        value2 = params.getVal2();
+        result = params.getResult();
+
+
+    }
+
+    private void clearFields() {
+        if (edit1 != null) edit1.setText("");
+        if (edit2 != null) edit2.setText("");
+        updateCalcParams(new CalculatorParams(new StringBuffer(), new StringBuffer(), null, false, null));
+
+    }
+
     private boolean isInErrorState(TextView field) {
-        if(field!=null)
-        return field.getText().toString().equals(getResources().getString(R.string.err_divide_by_zero));
+        if (field != null)
+            return field.getText().toString().equals(getResources().getString(R.string.err_divide_by_zero)) || field.getText().toString().equals(getResources().getString(R.string.err_data_na));
         else return true;
 
+    }
+
+    private void onBackSpaceClick() {
+        TextView currentSelectedFiled = getCurrentSelectedField();
+        TextView outputField = getOutputField();
+        if (currentSelectedFiled == null || currentSelectedFiled.getText().toString().isEmpty() || isInErrorState(currentSelectedFiled)) {
+            return;
+        }
+        String valueString = currentSelectedFiled.getText().toString();
+        valueString = valueString.substring(0, valueString.length() - 1);
+        if (valueString.isEmpty()) {
+            currentSelectedFiled.setText("");
+            if (outputField != null) outputField.setText("");
+            result = null;
+            return;
+        }
+        currentSelectedFiled.setText(valueString);
+
+        CalculatorParams params = Calculator.calculateFromString(valueString);
+        updateCalcParams(params);
+        BigDecimal paramsResult = params.getResult();
+
+        if (paramsResult != null) {
+            Log.d(TAG, "onBackSpaceClick: result = " + paramsResult.toPlainString());
+            ConvertAndDisplay convertAndDisplay = new ConvertAndDisplay(this.getContext(), getOutputField());
+            convertAndDisplay.execute(new ConvertAndDisplayParams(getConvertFromCurrency(), getConvertToCurrency(), paramsResult));
+        } else Log.d(TAG, "onBackSpaceClick: result null");
     }
 
 }

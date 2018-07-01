@@ -39,7 +39,7 @@ public class ConvertAndDisplay extends AsyncTask<ConvertAndDisplayParams,Void,St
             if(marketDao!=null) {
                 CoinPrices prices = marketDao.getCoinPricesFor(convertFromCurrency);
                 if(prices!=null && prices.getPrices()!=null && prices.getPrices().containsKey(convertToCurrency)) { //convert from crypto to fiat
-                    Log.d(TAG, "convertFromCurrency: "+prices.getPrices());
+                    //Log.d(TAG, "convertFromCurrency: "+prices.getPrices());
 
                         Double toPrice = prices.getPrices().get(convertToCurrency);
                         Log.d(TAG, "convert: unit toPrice = " + String.valueOf(toPrice));
@@ -49,7 +49,7 @@ public class ConvertAndDisplay extends AsyncTask<ConvertAndDisplayParams,Void,St
                     prices = marketDao.getCoinPricesFor(convertToCurrency);
 
                     if(prices!=null && prices.getPrices()!=null && prices.getPrices().containsKey(convertFromCurrency)) {
-                        Log.d(TAG, "convertToCurrency: "+prices.getPrices());
+                        //Log.d(TAG, "convertToCurrency: "+prices.getPrices());
                         Double unitPrice = prices.getPrices().get(convertFromCurrency);
                         return ((BigDecimal.ONE.divide(new BigDecimal(String.valueOf(unitPrice)), 8, RoundingMode.HALF_EVEN)).multiply(valToConvert)).toPlainString();
                     }
