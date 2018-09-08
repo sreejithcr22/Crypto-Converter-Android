@@ -53,5 +53,7 @@
     <dimen name="toolbar_title_text_size">22sp</dimen>
     <dimen name="toolbar_sub_title_text_size">16sp</dimen>
 
+    <!--fav list dialog!-->
+
 
 </resources>

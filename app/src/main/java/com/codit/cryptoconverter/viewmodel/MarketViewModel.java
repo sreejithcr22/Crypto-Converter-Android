@@ -5,8 +5,8 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
+import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.model.CoinPrices;
-import com.codit.cryptoconverter.orm.AppDatabase;
 
 import java.util.List;
 
@@ -17,22 +17,18 @@ import java.util.List;
 public class MarketViewModel extends AndroidViewModel {
 
 
-    public LiveData<List<CoinPrices>> getAllCoinPrices() {
-        return allCoinPrices;
-    }
-
-    private final LiveData<List<CoinPrices>> allCoinPrices;
-
-
-    private AppDatabase appDatabase;
+    private final LiveData<List<CoinPrices>> allCoinPricesLive;
 
     public MarketViewModel(@NonNull Application application) {
         super(application);
 
-        appDatabase = AppDatabase.getDatabase(this.getApplication());
 
-        allCoinPrices = appDatabase.marketDao().getAllCoinPricesLive();
+        allCoinPricesLive = MarketDB.getInstance().getAllCoinPricesLive(this.getApplication());
 
 
+    }
+
+    public LiveData<List<CoinPrices>> getAllCoinPricesLive() {
+        return allCoinPricesLive;
     }
 }

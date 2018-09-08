@@ -1,8 +1,7 @@
-package com.codit.cryptoconverter.manager;
+package com.codit.cryptoconverter.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 /**
  * Created by Sreejith on 28-Nov-17.

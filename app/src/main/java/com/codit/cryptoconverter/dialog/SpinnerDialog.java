@@ -1,4 +1,4 @@
-package com.codit.cryptoconverter.fragment;
+package com.codit.cryptoconverter.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,16 +12,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.adapter.SpinnerAdapter;
 import com.codit.cryptoconverter.listener.OnCurrencySelectedListener;
 import com.codit.cryptoconverter.listener.OnSpinnerItemClickListener;
 import com.codit.cryptoconverter.model.SpinnerItem;
-import com.codit.cryptoconverter.util.Coin;
 import com.codit.cryptoconverter.util.Constants;
-import com.codit.cryptoconverter.util.Currency;
+import com.codit.cryptoconverter.util.CryptoCurrency;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,11 +64,11 @@ public class SpinnerDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         List<SpinnerItem> items = new ArrayList<>();
-        for (Map.Entry<String, String> entry : Currency.getCurrencyData().entrySet()) {
+        for (String entry : getActivity().getResources().getStringArray(R.array.fiat_currencies)) {
 
-            items.add(new SpinnerItem(entry.getKey(), entry.getValue(), SpinnerItem.CURRENCY_TYPE_FIAT));
+            items.add(new SpinnerItem(entry, entry, SpinnerItem.CURRENCY_TYPE_FIAT));
         }
-        for (Map.Entry<String, String> entry : Coin.getCoinsData().entrySet()) {
+        for (Map.Entry<String, String> entry : CryptoCurrency.getCryptoCurrencyData().entrySet()) {
 
             items.add(new SpinnerItem(entry.getKey(), entry.getValue(), SpinnerItem.CURRENCY_TYPE_CRYPTO));
         }

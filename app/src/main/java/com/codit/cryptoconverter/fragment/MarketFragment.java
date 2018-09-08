@@ -18,11 +18,11 @@ import android.widget.Toast;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.adapter.MarketRecyclerAdapter;
+import com.codit.cryptoconverter.listener.RecyclerviewSearchListener;
 import com.codit.cryptoconverter.model.CoinPrices;
 import com.codit.cryptoconverter.service.BaseService;
 import com.codit.cryptoconverter.service.FetchMarketDataService;
 import com.codit.cryptoconverter.util.Connectivity;
-import com.codit.cryptoconverter.util.RecyclerviewSearchListener;
 import com.codit.cryptoconverter.viewmodel.MarketViewModel;
 
 import java.util.ArrayList;
@@ -95,7 +95,7 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
 
 
         MarketViewModel marketViewModel= ViewModelProviders.of(this).get(MarketViewModel.class);
-        marketViewModel.getAllCoinPrices().observe(MarketFragment.this, new Observer<List<CoinPrices>>() {
+        marketViewModel.getAllCoinPricesLive().observe(MarketFragment.this, new Observer<List<CoinPrices>>() {
             @Override
             public void onChanged(@Nullable List<CoinPrices> updatedPrices) {
 

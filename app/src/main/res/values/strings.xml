@@ -8,6 +8,7 @@
     </string>
 
     <string name="select_currency_dialog_title">Select currency</string>
+    <string name="fav_list_dialog_title">Favourites</string>
 
     <!--paper wallet addresses!-->
     <string name="bitcoin_address">1LnHWzy3sDttuPVHLQKrUyx3AasFo3ijyM</string>
@@ -17,7 +18,7 @@
 
 
     <!--currencies !-->
-    <string-array name="currencies">
+    <string-array name="fiat_currencies">
         <item>USD</item>
         <item>EUR</item>
         <item>CNY</item>
@@ -38,12 +39,10 @@
         <item>CZK</item>
         <item>ZAR</item>
         <item>KWD</item>
-        <item>ZMW</item>
+
         <item>AED</item>
         <item>KRW</item>
 
-
-        <!--
         <item>KHR</item>
         <item>TRY</item>
         <item>BHD</item>
@@ -67,6 +66,7 @@
         <item>QAR</item>
         <item>DASH</item>
         <item>BYN</item>
+        <!--
         <item>GEL</item>
         <item>EGP</item>
 

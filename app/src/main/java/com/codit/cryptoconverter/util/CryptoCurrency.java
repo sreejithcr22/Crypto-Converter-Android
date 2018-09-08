@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
  * Created by Sreejith on 22-Nov-17.
  */
 
-public class Coin {
+public class CryptoCurrency {
 
     public static final String BTC = "BTC";
     public static final String ETH = "ETH";
@@ -24,6 +24,7 @@ public class Coin {
     static {
         coinsData.put("BTC", "Bitcoin");
         coinsData.put("ETH", "Ethereum");
+
         coinsData.put("XRP", "Ripple");
         coinsData.put("BCH", "Bitcoin Cash");
         coinsData.put("LTC", "Litecoin");
@@ -70,11 +71,19 @@ public class Coin {
         coinsData.put("BTX", "Bitcore");
         coinsData.put("VTC", "Vertcoin");
         coinsData.put("DOGE", "DogeCoin");
+        coinsData.put("GNO", "GNO");
+        coinsData.put("BCD", "BCD");
+        coinsData.put("BAT", "BAT");
+        coinsData.put("ARN", "ARN");
+
+
+
+
 
 
     }
 
-    public static LinkedHashMap<String, String> getCoinsData() {
+    public static LinkedHashMap<String, String> getCryptoCurrencyData() {
         return coinsData;
     }
 

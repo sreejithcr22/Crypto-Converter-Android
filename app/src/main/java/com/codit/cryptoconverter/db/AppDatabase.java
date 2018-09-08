@@ -1,4 +1,4 @@
-package com.codit.cryptoconverter.orm;
+package com.codit.cryptoconverter.db;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
@@ -6,11 +6,12 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import com.codit.cryptoconverter.model.CoinPrices;
+import com.codit.cryptoconverter.model.FavouritePair;
 
 /**
  * Created by Sreejith on 22-Nov-17.
  */
-@Database(entities = {CoinPrices.class}, version = 1)
+@Database(entities = {CoinPrices.class, FavouritePair.class}, version = 1)
 
 public abstract class AppDatabase extends RoomDatabase{
 
@@ -25,4 +26,6 @@ public abstract class AppDatabase extends RoomDatabase{
     }
 
     public abstract MarketDao marketDao();
+
+    public abstract FavPairDao favPairDao();
 }

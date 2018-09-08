@@ -19,9 +19,8 @@ import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.fragment.ConverterFragment;
 import com.codit.cryptoconverter.fragment.MarketFragment;
 import com.codit.cryptoconverter.fragment.SettingsFragment;
-import com.codit.cryptoconverter.fragment.SpinnerDialog;
+import com.codit.cryptoconverter.helper.SharedPreferenceManager;
 import com.codit.cryptoconverter.listener.OnCurrencySelectedListener;
-import com.codit.cryptoconverter.manager.SharedPreferenceManager;
 import com.codit.cryptoconverter.model.SpinnerItem;
 
 import java.util.Arrays;
@@ -149,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
 
     void showChangeCurrencyDialog() {
 
-        final String currencies[] = getApplicationContext().getResources().getStringArray(R.array.currencies);
+        final String currencies[] = getApplicationContext().getResources().getStringArray(R.array.fiat_currencies);
         Arrays.sort(currencies);
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Change currency")

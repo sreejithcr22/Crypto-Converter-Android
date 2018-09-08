@@ -11,10 +11,9 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.codit.cryptoconverter.R;
-import com.codit.cryptoconverter.manager.SharedPreferenceManager;
+import com.codit.cryptoconverter.helper.SharedPreferenceManager;
 import com.codit.cryptoconverter.model.CoinPrices;
-import com.codit.cryptoconverter.util.Coin;
-import com.codit.cryptoconverter.util.Currency;
+import com.codit.cryptoconverter.util.CryptoCurrency;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,9 +50,9 @@ public class MarketRecyclerAdapter extends RecyclerView.Adapter<MarketRecyclerAd
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         String coinCode=coinPricesList.get(position).getCoinCode();
-        holder.coinCode.setText(Coin.getCoinName(coinCode)+" ("+coinCode+")");
+        holder.coinCode.setText(CryptoCurrency.getCoinName(coinCode) + " (" + coinCode + ")");
         String priceText=sharedPreferenceManager.getDefaultCurrency()+" "+String.valueOf(coinPricesList.get(position).getPrices().get(sharedPreferenceManager.getDefaultCurrency()));
-        holder.coinPrice.setText(priceText.contains("null") ? Coin.PRICE_NOT_AVAILABLE : priceText);
+        holder.coinPrice.setText(priceText.contains("null") ? CryptoCurrency.PRICE_NOT_AVAILABLE : priceText);
 
     }
 
@@ -87,7 +86,7 @@ public class MarketRecyclerAdapter extends RecyclerView.Adapter<MarketRecyclerAd
                 else {
                     List<CoinPrices> filteredList=new ArrayList<>();
                     for (CoinPrices coinPrices:coinPricesListCopy) {
-                        if(coinPrices.getCoinCode().toLowerCase().contains(searchString.toLowerCase())||Coin.getCoinName(coinPrices.getCoinCode()).toLowerCase().contains(searchString.toLowerCase()))
+                        if (coinPrices.getCoinCode().toLowerCase().contains(searchString.toLowerCase()) || CryptoCurrency.getCoinName(coinPrices.getCoinCode()).toLowerCase().contains(searchString.toLowerCase()))
                         {
                             filteredList.add(coinPrices);
                         }

@@ -16,12 +16,19 @@ import android.widget.Toast;
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.asynctask.ConvertAndDisplay;
 import com.codit.cryptoconverter.asynctask.ConvertAndDisplayParams;
+import com.codit.cryptoconverter.db.FavPairsDB;
+import com.codit.cryptoconverter.dialog.FavPairsListDialog;
+import com.codit.cryptoconverter.dialog.SpinnerDialog;
+import com.codit.cryptoconverter.listener.FavPairDBOperationsListener;
+import com.codit.cryptoconverter.listener.FavPairSelectedListener;
 import com.codit.cryptoconverter.model.CalculatorParams;
+import com.codit.cryptoconverter.model.FavouritePair;
 import com.codit.cryptoconverter.model.SpinnerItem;
 import com.codit.cryptoconverter.util.Calculator;
 import com.codit.cryptoconverter.util.Constants;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ConverterFragment extends Fragment {
     private static final String TAG = ConverterFragment.class.getSimpleName();
@@ -32,7 +39,15 @@ public class ConverterFragment extends Fragment {
     private BigDecimal result = null;
     private Button no0, no1, no2, no3, no4, no5, no6, no7, no8, no9,
             opAdd, opSub, opDiv, opEquals, opMultiply, numDot, opClear;
-    private ImageButton opBackSpace, btnAddFav;
+    private ImageButton opBackSpace, btnAddFav, btnShowFavList;
+    private FavPairSelectedListener favPairSelectedListener = new FavPairSelectedListener() {
+        @Override
+        public void onFavPairSelected(FavouritePair pair) {
+            currency1.setText(pair.getConvertFromCurrency());
+            currency2.setText(pair.getConvertToCurrency());
+            clearFields();
+        }
+    };
     private View.OnClickListener onCurrencyTextviewClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -199,6 +214,13 @@ public class ConverterFragment extends Fragment {
         }
     };
 
+    private View.OnClickListener onShowFavBtnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showFavListDialog();
+        }
+    };
+
     private View.OnClickListener onBackspaceListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -214,8 +236,23 @@ public class ConverterFragment extends Fragment {
         }
     };
 
+    private View.OnClickListener onAddFavBtnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String convertFromCurrency = getConvertFromCurrency();
+            String convertToCurrency = getConvertToCurrency();
 
+            if (convertFromCurrency != null && convertToCurrency != null) {
+                addFavPair(convertFromCurrency, convertToCurrency);
 
+            }
+        }
+    };
+
+    private void showFavListDialog() {
+        FavPairsListDialog favPairsListDialog = FavPairsListDialog.newInstance(favPairSelectedListener);
+        favPairsListDialog.show(getFragmentManager(), null);
+    }
 
     public ConverterFragment() {
         // Required empty public constructor
@@ -264,6 +301,8 @@ public class ConverterFragment extends Fragment {
         opBackSpace = view.findViewById(R.id.backspace);
         opClear = view.findViewById(R.id.clear);
         opEquals = view.findViewById(R.id.opEquals);
+        btnAddFav = view.findViewById(R.id.btn_add_fav);
+        btnShowFavList = view.findViewById(R.id.view_favs);
 
         no0.setOnClickListener(onCalcDigitButtonClickListener);
         no1.setOnClickListener(onCalcDigitButtonClickListener);
@@ -284,7 +323,8 @@ public class ConverterFragment extends Fragment {
         opBackSpace.setOnClickListener(onBackspaceListener);
         opClear.setOnClickListener(onClearButtonClickListener);
         opEquals.setOnClickListener(onOpEqualsClickListener);
-
+        btnAddFav.setOnClickListener(onAddFavBtnClickListener);
+        btnShowFavList.setOnClickListener(onShowFavBtnClickListener);
 
         return view;
     }
@@ -316,6 +356,7 @@ public class ConverterFragment extends Fragment {
 
 
     public void updateCurrencySelection(SpinnerItem item, int textViewId) {
+        FavPairsDB.getInstance(getActivity()).isFavPairExist(new FavouritePair(getConvertFromCurrency(), getConvertToCurrency()), listener);
         Log.d(TAG, "updateCurrencySelection: " + item.getCurrencyName());
         boolean isCurrencyUpdated = false;
         if (textViewId == -1) {
@@ -479,6 +520,53 @@ public class ConverterFragment extends Fragment {
             ConvertAndDisplay convertAndDisplay = new ConvertAndDisplay(this.getContext(), getOutputField());
             convertAndDisplay.execute(new ConvertAndDisplayParams(getConvertFromCurrency(), getConvertToCurrency(), paramsResult));
         } else Log.d(TAG, "onBackSpaceClick: result null");
+    }
+
+    private FavPairDBOperationsListener listener = new FavPairDBOperationsListener() {
+        @Override
+        public void onDbOpenFailed() {
+
+        }
+
+        @Override
+        public void onGenericError(String errorMessage) {
+
+        }
+
+        @Override
+        public void onFavPairAdded() {
+            Toast.makeText(getContext(), "Added to favourites !", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onFavPairAddFailed(String errorMessage) {
+            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onFavPairsFetched(List<FavouritePair> favouritePairList) {
+
+        }
+
+        @Override
+        public void onFavPairDeleted() {
+
+        }
+
+        @Override
+        public void onFavPairDeleteFailed(String message) {
+
+        }
+
+        @Override
+        public void onIsPairExistResult(boolean isExist) {
+            Log.d(TAG, "onIsPairExistResult: " + String.valueOf(isExist));
+        }
+    };
+
+    private void addFavPair(String convertFromCurrency, String convertToCurrency) {
+
+        FavPairsDB.getInstance(getActivity()).addFavPair(new FavouritePair(convertFromCurrency, convertToCurrency), listener);
     }
 
 }

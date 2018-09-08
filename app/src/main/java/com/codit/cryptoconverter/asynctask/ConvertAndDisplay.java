@@ -6,9 +6,9 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.codit.cryptoconverter.R;
+import com.codit.cryptoconverter.db.AppDatabase;
+import com.codit.cryptoconverter.db.MarketDao;
 import com.codit.cryptoconverter.model.CoinPrices;
-import com.codit.cryptoconverter.orm.AppDatabase;
-import com.codit.cryptoconverter.orm.MarketDao;
 import com.codit.cryptoconverter.util.Calculator;
 
 import java.math.BigDecimal;
@@ -24,6 +24,7 @@ public class ConvertAndDisplay extends AsyncTask<ConvertAndDisplayParams,Void,St
         this.context = context;
         this.outputField = outputField;
     }
+
     @Override
     protected String doInBackground(ConvertAndDisplayParams... params) {
 

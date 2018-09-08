@@ -15,7 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.codit.cryptoconverter.R;
-import com.codit.cryptoconverter.manager.SharedPreferenceManager;
+import com.codit.cryptoconverter.helper.SharedPreferenceManager;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

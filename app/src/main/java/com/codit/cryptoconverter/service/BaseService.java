@@ -3,19 +3,9 @@ package com.codit.cryptoconverter.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-import com.codit.cryptoconverter.http.ApiClient;
-import com.codit.cryptoconverter.orm.AppDatabase;
-import com.codit.cryptoconverter.orm.MarketDao;
-import com.codit.cryptoconverter.util.Coin;
+import com.codit.cryptoconverter.db.MarketDao;
 import com.codit.cryptoconverter.util.Connectivity;
-
-import java.io.IOException;
-import java.util.List;
-
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 
 public abstract class BaseService extends IntentService {
@@ -46,20 +36,7 @@ public abstract class BaseService extends IntentService {
     }
 
 
-    public void initializeDB() {
-        marketDao = AppDatabase.getDatabase(getApplicationContext()).marketDao();
-    }
 
-    double getCoinRateFromDB(String coinCode, String currency) {
-        try {
-            return marketDao.getCoinPricesFor(coinCode).getPrices().get(currency);
-        } catch (NullPointerException e) {
-            reportStatus("Cannot calculate wallet value since market data is not available, please refresh 'Market' tab to fetch coin prices.", REPORT_TYPE_WARNING);
-            return -1;
-        }
-
-
-    }
 
     void reportStatus(String message, String reportType) {
         Connectivity connectivity = new Connectivity(this.getApplicationContext());
