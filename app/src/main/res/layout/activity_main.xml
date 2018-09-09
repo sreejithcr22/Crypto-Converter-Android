@@ -33,7 +33,7 @@
         android:layout_height="0dp"></LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
-
+        android:visibility="gone"
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="@dimen/bottom_nav_height"

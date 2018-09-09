@@ -101,7 +101,7 @@ public class SpinnerDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.select_currency_dialog_title))
                 .setView(view)
-                .setPositiveButton(R.string.currency_selector_dialog_cancel_btn_text, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.dialog_cancel_btn_text, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (getDialog()!=null) {

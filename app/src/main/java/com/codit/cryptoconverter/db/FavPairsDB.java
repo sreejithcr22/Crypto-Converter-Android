@@ -136,10 +136,13 @@ public class FavPairsDB {
         private void isPairExist(FavouritePair pair) {
             boolean isPairExist = false;
             try {
-                int count = favPairDao.isPairExist(pair.getConvertFromCurrency(), pair.getConvertToCurrency()).size();
+                Log.d(TAG, "isPairExist: check-" + pair.getConvertFromCurrency() + "-" + pair.getConvertToCurrency());
+                List<FavouritePair> list = favPairDao.isPairExist(pair.getConvertFromCurrency(), pair.getConvertToCurrency());
+                int count = list.size();
                 Log.d(TAG, "isPairExist: " + count);
                 if (count > 0) {
                     isPairExist = true;
+                    Log.d(TAG, "isPairExist: pair=" + list.get(0).getConvertFromCurrency() + "-" + list.get(0).getConvertToCurrency());
                 }
             } catch (Exception e) {
                 isPairExist = false;

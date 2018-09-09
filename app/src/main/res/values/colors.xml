@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0088cc</color>
-    <color name="colorPrimaryDark">#0088cc</color>
-    <color name="colorAccent">#0088cc</color>
-    <color name="balance_bg_color">#00BCD4</color>
+    <color name="colorPrimary">#FD4A5A</color>
+    <color name="colorPrimaryDark">#FD4A5A</color>
+    <color name="colorAccent">#FD4A5A</color>
     <color name="price_bg_color">#66BB6A</color>
+    <color name="colorSecondary">#66BB6A</color>
+
+    <color name="calc_button_text_color">@android:color/black</color>
 </resources>

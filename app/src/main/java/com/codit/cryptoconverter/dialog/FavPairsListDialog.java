@@ -2,6 +2,7 @@ package com.codit.cryptoconverter.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -11,13 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.adapter.FavListAdapter;
 import com.codit.cryptoconverter.db.FavPairsDB;
+import com.codit.cryptoconverter.listener.FavDialogOperationsListener;
 import com.codit.cryptoconverter.listener.FavPairDBOperationsListener;
-import com.codit.cryptoconverter.listener.FavPairSelectedListener;
 import com.codit.cryptoconverter.model.FavouritePair;
 
 import java.util.ArrayList;
@@ -26,24 +28,31 @@ import java.util.List;
 public class FavPairsListDialog extends DialogFragment {
     private RecyclerView recyclerView;
     private FavListAdapter favListAdapter;
+    private TextView listEmptyMessageText;
     List<FavouritePair> favouritePairList = new ArrayList<>();
-    private FavPairSelectedListener converterFragmentCallback;
+    private FavDialogOperationsListener converterFragmentCallback;
 
-    public static FavPairsListDialog newInstance(FavPairSelectedListener favPairSelectedListener) {
+    public static FavPairsListDialog newInstance(FavDialogOperationsListener favDialogOperationsListener) {
         FavPairsListDialog dialog = new FavPairsListDialog();
-        dialog.setConverterFragmentCallback(favPairSelectedListener);
+        dialog.setConverterFragmentCallback(favDialogOperationsListener);
         return dialog;
     }
 
-    private FavPairSelectedListener dialogCallback = new FavPairSelectedListener() {
+    private FavDialogOperationsListener dialogCallback = new FavDialogOperationsListener() {
         @Override
         public void onFavPairSelected(FavouritePair pair) {
-            if (getDialog() != null) getDialog().dismiss();
             converterFragmentCallback.onFavPairSelected(pair);
+            if (getDialog() != null) getDialog().dismiss();
+
+        }
+
+        @Override
+        public void onFavDialogDismissed() {
+
         }
     };
 
-    private void setConverterFragmentCallback(FavPairSelectedListener listener) {
+    private void setConverterFragmentCallback(FavDialogOperationsListener listener) {
         this.converterFragmentCallback = listener;
     }
 
@@ -70,6 +79,9 @@ public class FavPairsListDialog extends DialogFragment {
 
         @Override
         public void onFavPairsFetched(List<FavouritePair> fetchedList) {
+            if (fetchedList.isEmpty()) {
+                listEmptyMessageText.setVisibility(View.VISIBLE);
+            }
             favouritePairList.clear();
             favouritePairList.addAll(fetchedList);
             for (FavouritePair favouritePair : favouritePairList) {
@@ -101,9 +113,10 @@ public class FavPairsListDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.fav_pais_list_dialog, null);
         recyclerView = dialogView.findViewById(R.id.fav_list_recycler);
+        listEmptyMessageText = dialogView.findViewById(R.id.fav_list_empty_message);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        favListAdapter = new FavListAdapter(favouritePairList, getActivity(), dialogCallback);
+        favListAdapter = new FavListAdapter(favouritePairList, getActivity(), dialogCallback, listEmptyMessageText);
         recyclerView.setAdapter(favListAdapter);
 
 
@@ -113,6 +126,7 @@ public class FavPairsListDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(dialogView);
+        builder.setPositiveButton(R.string.dialog_cancel_btn_text, null);
         return builder.create();
 
     }
@@ -125,5 +139,12 @@ public class FavPairsListDialog extends DialogFragment {
 
     private void populateList() {
         FavPairsDB.getInstance(getContext()).getAllFavPairs(favPairDBOperationsListener);
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        converterFragmentCallback.onFavDialogDismissed();
+
     }
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Crypto Converter</string>
     <string name="title_converter">Converter</string>
-    <string name="title_market">Coins</string>
+    <string name="title_market">Market</string>
     <string name="title_settings">Settings</string>
     <string name="credits">
         Icons - \nhttps://www.flaticon.com\n\nAPI - \nhttps://www.cryptocompare.com\nhttps://www.blockcypher.com
@@ -83,9 +83,11 @@
     <string name="same_currency_value">Currency values cannot be the same !</string>
 
 
-    <string name="currency_selector_dialog_cancel_btn_text">Cancel</string>
+    <string name="dialog_cancel_btn_text">Close</string>
     <string name="err_divide_by_zero">Can\'t divide by zero</string>
     <string name="err_data_na">Data not available</string>
+
+    <string name="fav_pairs_empty_message">Favourite list empty !</string>
 
     <item type="id" name="IS_CURRENT_SELECTED_FIELD"/>
     <item type="id" name="TAG_CURRENT_OP"/>

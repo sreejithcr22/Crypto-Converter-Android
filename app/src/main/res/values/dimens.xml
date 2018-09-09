@@ -55,5 +55,21 @@
 
     <!--fav list dialog!-->
 
+    <!--calculator-->
+    <dimen name="calc_button_text_size">20sp</dimen>
+    <dimen name="calc_button_operator_text_size">25sp</dimen>
+
+    <!--converter!-->
+    <dimen name="currency_label_margin_left_right">16dp</dimen>
+    <dimen name="currency_label_margin_top_bottom">16dp</dimen>
+    <dimen name="currency_label_margin_middle">8dp</dimen>
+
+    <dimen name="currency_label_text_size">16sp</dimen>
+    <dimen name="converter_edit_text_size">16sp</dimen>
+    <dimen name="converter_edit_padding">7dp</dimen>
+
+    <dimen name="card_view_elevation">3dp</dimen>
+    <dimen name="card_view_corner_radius">3dp</dimen>
+
 
 </resources>

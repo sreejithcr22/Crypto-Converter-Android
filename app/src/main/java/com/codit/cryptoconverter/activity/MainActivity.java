@@ -43,22 +43,26 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             switch (item.getItemId()) {
 
                 case R.id.navigation_converter:
-                    getSupportActionBar().setTitle("Converter");
-                    if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_CONVERTER) == null)
+                    getSupportActionBar().setTitle(getResources().getString(R.string.title_converter));
+                    if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_CONVERTER) == null) {
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ConverterFragment(), FRAGMENT_CONVERTER).commit();
+                    }
                     return true;
 
                 case R.id.navigation_market:
-                    searchView.setVisibility(View.VISIBLE);
-                    getSupportActionBar().setTitle("Coins");
-                    if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_MARKET) == null)
+
+                    getSupportActionBar().setTitle(getResources().getString(R.string.title_market));
+                    if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_MARKET) == null) {
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MarketFragment(), FRAGMENT_MARKET).commit();
+                        searchView.setVisibility(View.VISIBLE);
+                    }
 
                     return true;
                 case R.id.navigation_settings:
-                    getSupportActionBar().setTitle("Settings");
-                    if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_SETTINGS) == null)
+                    getSupportActionBar().setTitle(getResources().getString(R.string.title_settings));
+                    if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_SETTINGS) == null) {
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment(), FRAGMENT_SETTINGS).commit();
+                    }
 
                     return true;
             }
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Wallets");
+        toolbar.setTitle(getResources().getString(R.string.title_converter));
         setSupportActionBar(toolbar);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ConverterFragment(), FRAGMENT_CONVERTER).commit();

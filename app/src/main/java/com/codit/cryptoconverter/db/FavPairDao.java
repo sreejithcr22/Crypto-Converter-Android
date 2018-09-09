@@ -23,6 +23,6 @@ public interface FavPairDao {
     @Delete
     int deleteFavPair(FavouritePair pair);
 
-    @Query("Select * from FavouritePair where convertFromCurrency=:convertFromCurrency and convertToCurrency=:convertToCurrency")
-    List<FavouritePair> isPairExist(String convertFromCurrency, String convertToCurrency);
+    @Query("Select * from FavouritePair where convertFromCurrency=:convertFrom and convertToCurrency=:convertTo")
+    List<FavouritePair> isPairExist(String convertFrom, String convertTo);
 }

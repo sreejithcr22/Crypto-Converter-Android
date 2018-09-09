@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.db.FavPairsDB;
+import com.codit.cryptoconverter.listener.FavDialogOperationsListener;
 import com.codit.cryptoconverter.listener.FavPairDeleteCallback;
-import com.codit.cryptoconverter.listener.FavPairSelectedListener;
 import com.codit.cryptoconverter.model.FavouritePair;
 import com.codit.cryptoconverter.util.Util;
 
@@ -21,18 +21,23 @@ import java.util.List;
 public class FavListAdapter extends RecyclerView.Adapter<FavListAdapter.FavPairViewHolder> {
     private List<FavouritePair> currencyPairs;
     private Context context;
-    private FavPairSelectedListener favPairSelectedListener;
+    private FavDialogOperationsListener favDialogOperationsListener;
+    private TextView listEmptyText;
     private static final String TAG = FavListAdapter.class.getSimpleName();
 
-    public FavListAdapter(List<FavouritePair> currencyPairs, Context context, FavPairSelectedListener favPairSelectedListener) {
+    public FavListAdapter(List<FavouritePair> currencyPairs, Context context, FavDialogOperationsListener favDialogOperationsListener, TextView listEmptyText) {
         this.currencyPairs = currencyPairs;
         this.context = context;
-        this.favPairSelectedListener = favPairSelectedListener;
+        this.favDialogOperationsListener = favDialogOperationsListener;
+        this.listEmptyText = listEmptyText;
     }
 
     public void deleteFavPair(int pos) {
         currencyPairs.remove(currencyPairs.get(pos));
         notifyDataSetChanged();
+        if (currencyPairs.isEmpty() && listEmptyText != null) {
+            listEmptyText.setVisibility(View.VISIBLE);
+        }
     }
 
     private FavListAdapter getFavListAdapter() {
@@ -68,9 +73,9 @@ public class FavListAdapter extends RecyclerView.Adapter<FavListAdapter.FavPairV
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (favPairSelectedListener != null) {
+                if (favDialogOperationsListener != null) {
                     FavouritePair pair = currencyPairs.get((Integer) v.getTag());
-                    favPairSelectedListener.onFavPairSelected(pair);
+                    favDialogOperationsListener.onFavPairSelected(pair);
                 }
             }
         });
