@@ -5,6 +5,11 @@ package com.codit.cryptoconverter.util;
  */
 
 public final class Constants {
+
+    public static final String FRAGMENT_MARKET = "market_fragment";
+    public static final String FRAGMENT_CONVERTER = "converter_fragment";
+    public static final String FRAGMENT_SETTINGS = "settings_fragment";
+
     public static final String EXTRA_CURRENCY_TEXTVIEW_ID = "currency_textview_id";
     public static final String GENERIC_ERROR_MESSAGE = "Sorry, something went wrong !";
     public static final String CURRENCY1_DEFAULT_VALUE = "BTC";
@@ -15,4 +20,8 @@ public final class Constants {
     public static final int API_CALL_DELAY = 5000;
     public static final int API_CALL_FSYS_ARG_LIMIT = 50;
     public static final int API_CALL_TOSYS_ARG_LIMIT = 20;
+
+    public static final String CRYPTO_WATCH_WALLET_PACKAGE = "com.codit.cryptowatchwallet";
+
+    public static final String BTN_ADD_FAV_TAG = "btn_add_fav_tag";
 }

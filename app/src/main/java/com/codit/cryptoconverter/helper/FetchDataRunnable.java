@@ -3,7 +3,6 @@ package com.codit.cryptoconverter.helper;
 import android.content.Context;
 import android.util.Log;
 
-import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.listener.FetchDataCallback;
 import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.UrlBuilder;
@@ -36,8 +35,7 @@ public class FetchDataRunnable implements Runnable {
         String fsysUrl = UrlBuilder.buildCryptoCurrencyList(fsysStartIndex, fsysEndIndex);
         String toSysUrl;
         if (toSys.equals(Constants.CURRENCY_TYPE_FIAT)) {
-            //TODO: chnae array to class code
-            toSysUrl = UrlBuilder.buildFiatCurrencyList(context.getResources().getStringArray(R.array.fiat_currencies), tosysStartIndex, tosysEndIndex);
+            toSysUrl = UrlBuilder.buildFiatCurrencyList(tosysStartIndex, tosysEndIndex);
         } else {
             toSysUrl = UrlBuilder.buildCryptoCurrencyList(tosysStartIndex, tosysEndIndex);
         }

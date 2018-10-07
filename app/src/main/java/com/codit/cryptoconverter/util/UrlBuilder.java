@@ -26,17 +26,20 @@ public class UrlBuilder {
 
         endIndex = currencyCodes.length < endIndex ? currencyCodes.length : endIndex;
         Log.d(TAG, "buildCryptoCurrencyList: endIndex=" + String.valueOf(endIndex));
-        for (int i = startIndex; i < endIndex; i++) {
-            coinList.append(currencyCodes[i] + ",");
+        for (int i = startIndex; i <= endIndex; i++) {
+            if (currencyCodes.length != i) {
+                coinList.append(currencyCodes[i] + ",");
+            }
         }
         coinList.setLength(coinList.length()-1);
         Log.d(TAG, coinList.toString());
         return coinList.toString();
     }
 
-    public static String buildFiatCurrencyList(String currencyArray[], int startIndex, int endIndex)
+    public static String buildFiatCurrencyList(int startIndex, int endIndex)
     {
-
+        Object array[] = FiatCurrency.getCurrencyData().keySet().toArray();
+        String[] currencyArray = Arrays.copyOf(array, array.length, String[].class);
         StringBuffer currencyList=new StringBuffer();
         endIndex = currencyArray.length < endIndex ? currencyArray.length : endIndex;
         Log.d(TAG, "buildFiatCurrencyList: endIndex=" + String.valueOf(endIndex));

@@ -116,7 +116,8 @@ public class FavPairsDB {
         }
 
         private void deleteFavPair(FavouritePair pair) {
-            if (favPairDao.deleteFavPair(pair) > 0) {
+            FavouritePair reversePair = new FavouritePair(pair.getConvertToCurrency(), pair.getConvertFromCurrency());
+            if (favPairDao.deleteFavPair(pair) > 0 || favPairDao.deleteFavPair(reversePair) > 0) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {

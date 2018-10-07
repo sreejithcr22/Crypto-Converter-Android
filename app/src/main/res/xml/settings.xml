@@ -2,15 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
         <Preference
-            android:defaultValue="0"
-            android:key="default_currency"
-            android:title="Currency"
+            android:summary="Checkout the app on Play Store"
+            android:key="crypto_watch_wallet"
+            android:title="Crypto Watch Wallet"
             ></Preference>
 
         <Preference android:title="Rate us" android:key="settings_rate_us" android:summary="Rate the app on playstore"></Preference>
         <Preference android:title="Share app" android:key="settings_share_app" android:summary="Spread the word"></Preference>
         <Preference android:title="Feedback" android:key="settings_contact_us" android:summary="codit.apps@gmail.com"></Preference>
-        <Preference android:title="Donate" android:key="settings_donate" android:summary="Donate using crypto currency"></Preference>
         <Preference android:title="Credits" android:key="settings_credits" ></Preference>
 
 

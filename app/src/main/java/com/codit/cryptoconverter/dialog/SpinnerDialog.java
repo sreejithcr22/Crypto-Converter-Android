@@ -20,8 +20,11 @@ import com.codit.cryptoconverter.listener.OnSpinnerItemClickListener;
 import com.codit.cryptoconverter.model.SpinnerItem;
 import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.CryptoCurrency;
+import com.codit.cryptoconverter.util.FiatCurrency;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,14 +35,14 @@ import java.util.Map;
 public class SpinnerDialog extends DialogFragment {
 
     private static final String TAG = "search";
-    private OnCurrencySelectedListener onCurrencySelectedListener ;
+    private OnCurrencySelectedListener onCurrencySelectedListener;
     private int currentSelectedLabelId = -1;
     private OnSpinnerItemClickListener onSpinnerItemClickListener = new OnSpinnerItemClickListener() {
         @Override
         public void onSpinnerItemClick(SpinnerItem item) {
-            Log.d(TAG, "onSpinnerItemClick: "+item.getCurrencyName());
-            if(getDialog()!=null) {
-                if(onCurrencySelectedListener != null) {
+            Log.d(TAG, "onSpinnerItemClick: " + item.getCurrencyName());
+            if (getDialog() != null) {
+                if (onCurrencySelectedListener != null) {
                     onCurrencySelectedListener.onCurrencySelected(item, currentSelectedLabelId);
                 }
                 getDialog().dismiss();
@@ -48,15 +51,14 @@ public class SpinnerDialog extends DialogFragment {
     };
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       onCurrencySelectedListener = (OnCurrencySelectedListener) getActivity();
-       Bundle args = getArguments();
-       if(args != null) {
-           currentSelectedLabelId = args.getInt(Constants.EXTRA_CURRENCY_TEXTVIEW_ID,-1);
-       }
+        onCurrencySelectedListener = (OnCurrencySelectedListener) getActivity();
+        Bundle args = getArguments();
+        if (args != null) {
+            currentSelectedLabelId = args.getInt(Constants.EXTRA_CURRENCY_TEXTVIEW_ID, -1);
+        }
     }
 
 
@@ -64,16 +66,26 @@ public class SpinnerDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         List<SpinnerItem> items = new ArrayList<>();
-        for (String entry : getActivity().getResources().getStringArray(R.array.fiat_currencies)) {
 
-            items.add(new SpinnerItem(entry, entry, SpinnerItem.CURRENCY_TYPE_FIAT));
-        }
         for (Map.Entry<String, String> entry : CryptoCurrency.getCryptoCurrencyData().entrySet()) {
 
             items.add(new SpinnerItem(entry.getKey(), entry.getValue(), SpinnerItem.CURRENCY_TYPE_CRYPTO));
         }
 
-        final SpinnerAdapter adapter = new SpinnerAdapter(getActivity(), items, onSpinnerItemClickListener);
+        for (Map.Entry<String, String> entry : FiatCurrency.getCurrencyData().entrySet()) {
+
+            items.add(new SpinnerItem(entry.getKey(), entry.getValue(), SpinnerItem.CURRENCY_TYPE_FIAT));
+        }
+
+        Collections.sort(items, new Comparator<SpinnerItem>() {
+            @Override
+            public int compare(SpinnerItem o1, SpinnerItem o2) {
+                return o1.getCurrencyName().compareTo(o2.getCurrencyName());
+            }
+        });
+
+
+        final SpinnerAdapter adapter = new SpinnerAdapter(items, onSpinnerItemClickListener);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.spinner_dialog_layout, null);
         SearchView searchView = view.findViewById(R.id.dialog_search);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -104,7 +116,7 @@ public class SpinnerDialog extends DialogFragment {
                 .setPositiveButton(R.string.dialog_cancel_btn_text, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (getDialog()!=null) {
+                        if (getDialog() != null) {
                             getDialog().dismiss();
                         }
                     }

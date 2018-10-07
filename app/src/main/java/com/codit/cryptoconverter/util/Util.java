@@ -16,6 +16,16 @@ public class Util {
             return Constants.CURRENCY_TYPE_FIAT;
         else if (CryptoCurrency.getCryptoCurrencyData().containsKey(currencyCode))
             return Constants.CURRENCY_TYPE_CRYPTO;
-        else return null;
+        else return Constants.CURRENCY_TYPE_FIAT;
+    }
+
+    public static String extractCurrencyCode(String string) {
+
+        try {
+            String arr[] = string.split("\\(");
+            return arr[1].substring(0, arr[1].length() - 1);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.codit.cryptoconverter.adapter;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,13 +23,11 @@ import java.util.List;
 
 public class SpinnerAdapter extends RecyclerView.Adapter<SpinnerAdapter.SpinnerViewHolder> implements Filterable {
     private static final String TAG = "search";
-    private Context mContext;
-    private List<SpinnerItem> spinnerItems = new ArrayList<>();
-    private List<SpinnerItem> spinnerItemsCopy = new ArrayList<>();
+    private List<SpinnerItem> spinnerItems;
+    private List<SpinnerItem> spinnerItemsCopy;
     private static OnSpinnerItemClickListener onSpinnerItemClickListener;
 
-    public SpinnerAdapter(Context mContext, List<SpinnerItem> spinnerItems, OnSpinnerItemClickListener listener) {
-        this.mContext = mContext;
+    public SpinnerAdapter(List<SpinnerItem> spinnerItems, OnSpinnerItemClickListener listener) {
         this.spinnerItems = spinnerItems;
         this.spinnerItemsCopy = spinnerItems;
         this.onSpinnerItemClickListener = listener;

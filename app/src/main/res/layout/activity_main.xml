@@ -20,7 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" />
+            android:background="@color/colorPrimary" />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -32,16 +32,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"></LinearLayout>
 
-    <android.support.design.widget.BottomNavigationView
-        android:visibility="gone"
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_nav_height"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
 
-        android:background="?android:attr/windowBackground"
-
-        app:menu="@menu/navigation" />
 
 </LinearLayout>

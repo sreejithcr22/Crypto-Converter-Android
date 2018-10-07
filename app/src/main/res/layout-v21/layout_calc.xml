@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout android:id="@+id/calcGrandParent"
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/calcGrandParent"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <LinearLayout
-        android:id="@+id/calcParent"
+    <LinearLayout android:id="@+id/calcParent"
         android:visibility="visible"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
@@ -35,6 +35,7 @@
 
             <ImageButton
                 android:src="@drawable/ic_favourite_list"
+                android:tint="@color/calc_button_text_selector"
                 android:id="@+id/view_favs"
                 android:background="@drawable/calc_button_selector"
                 android:layout_weight="1"
@@ -42,6 +43,7 @@
                 android:layout_height="match_parent" />
 
             <ImageButton
+                android:tint="@color/calc_button_text_selector"
                 android:src="@drawable/ic_market"
                 android:id="@+id/btn_market"
                 android:background="@drawable/calc_button_selector"
@@ -50,6 +52,7 @@
                 android:layout_height="match_parent" />
 
             <ImageButton
+                android:tint="@color/calc_button_text_selector"
                 android:background="@drawable/calc_button_selector"
                 android:src="@drawable/ic_more"
                 android:id="@+id/btn_more"
@@ -99,15 +102,15 @@
                         android:background="@drawable/calc_button_selector"
                         android:layout_weight="2"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        />
+                        android:layout_height="match_parent" />
 
                     <ImageButton
                         android:id="@+id/backspace"
                         android:background="@drawable/calc_button_selector"
                         android:layout_weight="1"
                         android:layout_width="0dp"
-                        android:src="@drawable/ic_backspace"
+                        app:srcCompat="@drawable/ic_backspace"
+                        android:tint="@color/calc_button_text_selector"
                         android:layout_height="match_parent" />
 
 
@@ -285,8 +288,6 @@
                         android:layout_height="match_parent" />
 
 
-
-
                 </LinearLayout>
 
                 <!--row 5 end !-->
@@ -365,7 +366,6 @@
                     android:layout_height="0dp" />
 
             </LinearLayout>
-
 
 
             <!--operator layout ends!-->

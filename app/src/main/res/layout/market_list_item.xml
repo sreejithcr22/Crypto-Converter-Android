@@ -2,10 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/market_list_item_height"
-    android:layout_marginLeft="@dimen/wallet_item_left_right_margin"
-    android:layout_marginRight="@dimen/wallet_item_left_right_margin"
-    android:paddingTop="@dimen/wallet_item_top_bottom_padding"
-    android:paddingBottom="@dimen/wallet_item_top_bottom_padding">
+    android:layout_marginLeft="@dimen/market_list_item_left_right_margin"
+    android:layout_marginRight="@dimen/market_list_item_left_right_margin"
+    android:paddingTop="@dimen/market_list_item_top_bottom_padding"
+    android:paddingBottom="@dimen/market_list_item_top_bottom_padding">
 
     <TextView
         android:layout_centerVertical="true"
@@ -26,7 +26,7 @@
         android:id="@+id/coin_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/wallet_list_item_coin_code_margin_top"
+        android:layout_marginTop="@dimen/market_list_list_item_coin_code_margin_top"
         android:background="@drawable/price_green_bg"
         android:fontFamily="@font/colabreg"
         android:singleLine="true"

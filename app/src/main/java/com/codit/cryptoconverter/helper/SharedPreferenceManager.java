@@ -9,42 +9,43 @@ import android.content.SharedPreferences;
 
 public class SharedPreferenceManager {
 
-    public static final String DEFAULT_CURRENCY="default_currency";
-    public static final String REFRESH_INTERVAL="refresh_interval";
+    public static final String CRYPTO_WATCH = "crypto_watch_wallet";
     public static final String RATE_APP = "settings_rate_us";
     public static final String CONTACT_US = "settings_contact_us";
     public static final String SHARE_APP = "settings_share_app";
-    public static final String DONATE = "settings_donate";
     public static final String CREDITS = "settings_credits";
-    public static final String SESSION_COUNT="session_count";
-    public static boolean SESSION_COUNT_UPDATED=false;
-    public  static final String UNIQUE_ID ="nitif_id";
-    public static final String NOTIFICATION_Q="notif_q";
+    public static final String SESSION_COUNT = "session_count";
+    public static final String FAV_DELETE_MESSAGE_SHOWN = "fav_delete_message_shown";
+    public static final String IS_INITIAL_DATA_DOWNLOADED = "is_data_downloaded";
 
     SharedPreferences preferenceManager;
 
-    public SharedPreferenceManager(Context context)
-    {
-        preferenceManager= android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+    public SharedPreferenceManager(Context context) {
+        preferenceManager = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
 
     }
 
-    public void setDefaultCurrency(String currency){preferenceManager.edit().putString(DEFAULT_CURRENCY,currency).apply();}
-    public String getDefaultCurrency(){return preferenceManager.getString(DEFAULT_CURRENCY,"USD");}
-    public void setSessionCount(int sessionCount){preferenceManager.edit().putInt(SESSION_COUNT,sessionCount).apply();}
-    public int getSessionCount(){return preferenceManager.getInt(SESSION_COUNT,0);}
-    private int getUniqueID() {return preferenceManager.getInt(UNIQUE_ID,1);}
-    public String getNotificationQ(){return preferenceManager.getString(NOTIFICATION_Q,null);}
-
-    public int generateUniqueID()
-    {
-        preferenceManager.edit().putInt(UNIQUE_ID, getUniqueID()+1).commit();
-        return getUniqueID();
+    public String getDefaultCurrency() {
+        return preferenceManager.getString(CRYPTO_WATCH, "USD");
     }
 
-    public void updateNotificationQ(String jsonString)
-    {
-        preferenceManager.edit().putString(NOTIFICATION_Q,jsonString).commit();
+    public void setDefaultCurrency(String currency) {
+        preferenceManager.edit().putString(CRYPTO_WATCH, currency).apply();
     }
 
+    public void setFavDeleteMessageShown(boolean isShown) {
+        preferenceManager.edit().putBoolean(FAV_DELETE_MESSAGE_SHOWN, isShown).apply();
+    }
+
+    public boolean isFavDeleteMessageShown() {
+        return preferenceManager.getBoolean(FAV_DELETE_MESSAGE_SHOWN, false);
+    }
+
+    public void setIsInitialDataDownloaded(boolean isInitialDataDownloaded) {
+        preferenceManager.edit().putBoolean(IS_INITIAL_DATA_DOWNLOADED, isInitialDataDownloaded).commit();
+    }
+
+    public boolean isInitialDataDownloaded() {
+        return preferenceManager.getBoolean(IS_INITIAL_DATA_DOWNLOADED, false);
+    }
 }

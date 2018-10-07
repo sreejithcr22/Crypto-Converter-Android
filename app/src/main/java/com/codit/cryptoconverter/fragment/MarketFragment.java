@@ -10,7 +10,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +82,7 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
                         if(! connectivity.isConnected())
                         {
                             swipeRefreshLayout.setRefreshing(false);
-                            Toast.makeText(getContext(),"No internet !",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
                             return;
                         }
                         Intent intent=new Intent(getContext(),FetchMarketDataService.class);
@@ -98,10 +97,6 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
         marketViewModel.getAllCoinPricesLive().observe(MarketFragment.this, new Observer<List<CoinPrices>>() {
             @Override
             public void onChanged(@Nullable List<CoinPrices> updatedPrices) {
-
-                for (CoinPrices p:coinPricesList) {
-                    Log.d("viewmodel", "onChanged: "+p.getCoinCode());
-                }
 
                 swipeRefreshLayout.setRefreshing(false);
                 marketRecyclerAdapter.updateData(updatedPrices);
@@ -121,7 +116,6 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
     {
         marketRecyclerAdapter.notifyDataSetChanged();
     }
-
 
 
 }

@@ -14,12 +14,10 @@
     <dimen name="edit_text_height">60dp</dimen>
 
     <!--wallet list item!-->
-    <dimen name="wallet_item_height">90dp</dimen>
-    <dimen name="wallet_item_left_right_margin">22dp</dimen>
-    <dimen name="wallet_item_top_bottom_padding">5dp</dimen>
-    <dimen name="wallet_list_item_name_text_size">23sp</dimen>
+    <dimen name="market_list_item_left_right_margin">22dp</dimen>
+    <dimen name="market_list_item_top_bottom_padding">5dp</dimen>
     <dimen name="wallet_list_item_label_text_size">16sp</dimen>
-    <dimen name="wallet_list_item_coin_code_margin_top">8dp</dimen>
+    <dimen name="market_list_list_item_coin_code_margin_top">8dp</dimen>
     <dimen name="wallet_list_item_price_text_size">17sp</dimen>
 
     <!--market list item!-->
@@ -52,6 +50,27 @@
     <dimen name="bottom_nav_height">70dp</dimen>
     <dimen name="toolbar_title_text_size">27sp</dimen>
     <dimen name="toolbar_sub_title_text_size">18sp</dimen>
+
+    <!--new values!-->
+
+    <dimen name="currency_selector_row_text_size">17sp</dimen>
+    <dimen name="currency_selector_row_padding">10dp</dimen>
+
+    <!--calculator-->
+    <dimen name="calc_button_text_size">23sp</dimen>
+    <dimen name="calc_button_operator_text_size">27sp</dimen>
+
+    <!--converter!-->
+    <dimen name="currency_label_margin_left_right">20dp</dimen>
+    <dimen name="currency_label_margin_top_bottom">20dp</dimen>
+    <dimen name="currency_label_margin_middle">10dp</dimen>
+
+    <dimen name="currency_label_text_size">20sp</dimen>
+    <dimen name="converter_edit_text_size">20sp</dimen>
+    <dimen name="converter_edit_padding">10dp</dimen>
+
+    <dimen name="card_view_elevation">4dp</dimen>
+    <dimen name="card_view_corner_radius">3dp</dimen>
 
 
 </resources>

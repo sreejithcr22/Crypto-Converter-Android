@@ -7,4 +7,7 @@
     <color name="colorSecondary">#66BB6A</color>
 
     <color name="calc_button_text_color">@android:color/black</color>
+    <color name="color_white">@android:color/white</color>
+    <color name="color_black">@android:color/black</color>
+
 </resources>

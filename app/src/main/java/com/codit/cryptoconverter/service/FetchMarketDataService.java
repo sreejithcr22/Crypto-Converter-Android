@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.helper.FetchDataRunnable;
 import com.codit.cryptoconverter.http.ApiClient;
@@ -14,6 +13,7 @@ import com.codit.cryptoconverter.http.MarketApi;
 import com.codit.cryptoconverter.listener.FetchDataCallback;
 import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.CryptoCurrency;
+import com.codit.cryptoconverter.util.FiatCurrency;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
             handler = new Handler(handlerThread.getLooper());
 
             int fsysIterator = (int) Math.ceil(Double.valueOf(String.valueOf(CryptoCurrency.getCryptoCurrencyData().size())) / Double.valueOf(Constants.API_CALL_FSYS_ARG_LIMIT));
-            int tosysIterator = (int) Math.ceil(Double.valueOf(String.valueOf(getApplicationContext().getResources().getStringArray(R.array.fiat_currencies).length)) / Double.valueOf(Constants.API_CALL_TOSYS_ARG_LIMIT));
+            int tosysIterator = (int) Math.ceil(Double.valueOf(String.valueOf(FiatCurrency.getCurrencyData().size())) / Double.valueOf(Constants.API_CALL_TOSYS_ARG_LIMIT));
             int tosysCryptoIterator = (int) Math.ceil(Double.valueOf(String.valueOf(CryptoCurrency.getCryptoCurrencyData().size())) / Double.valueOf(Constants.API_CALL_TOSYS_ARG_LIMIT));
             Log.d(TAG, "fsysIterator=" + String.valueOf(fsysIterator) + ", tosysIterator=" + String.valueOf(tosysIterator) + ", tosysCryptoIterator=" + tosysCryptoIterator);
 

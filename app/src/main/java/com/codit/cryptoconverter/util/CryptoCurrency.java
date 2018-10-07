@@ -1,6 +1,5 @@
 package com.codit.cryptoconverter.util;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -24,7 +23,6 @@ public class CryptoCurrency {
     static {
         coinsData.put("BTC", "Bitcoin");
         coinsData.put("ETH", "Ethereum");
-
         coinsData.put("XRP", "Ripple");
         coinsData.put("BCH", "Bitcoin Cash");
         coinsData.put("LTC", "Litecoin");
@@ -75,6 +73,55 @@ public class CryptoCurrency {
         coinsData.put("BCD", "BCD");
         coinsData.put("BAT", "BAT");
         coinsData.put("ARN", "ARN");
+        coinsData.put("QTUM", "QTUM");
+        coinsData.put("BIX", "BiboxCoin");
+        coinsData.put("BNB", "BinanceCoin");
+        coinsData.put("XUC", "Exchange Union");
+        coinsData.put("HT", "Huobi Token");
+        coinsData.put("QKC", "QuarkChain");
+        coinsData.put("ZIL", "Zilliqa");
+        coinsData.put("NANO", "NANO");
+        coinsData.put("MITH", "Mithril");
+        coinsData.put("IOST", "IOS Token");
+        coinsData.put("QASH", "Quoine Liquid");
+        coinsData.put("NAS", "Nebulas");
+        coinsData.put("POWR", "Power Ledger");
+        coinsData.put("IOTX", "IoTeX Network");
+        coinsData.put("CVC", "Civic");
+        coinsData.put("RDD", "Reddcoin");
+        coinsData.put("OCN", "Odyssey");
+        coinsData.put("ELF", "aelf");
+        coinsData.put("CTXC", "Cortex");
+        coinsData.put("STEEM", "Steem");
+        coinsData.put("KNC", "Kyber Network");
+        coinsData.put("SALT", "Salt Lending");
+        coinsData.put("GTO", "GIFTO");
+        coinsData.put("BLZ", "Bluezelle");
+        coinsData.put("UBTC", "UnitedBitcoin");
+        coinsData.put("XZC", "ZCoin");
+        coinsData.put("GVT", "Genesis Vision");
+        coinsData.put("NULS", "Nuls");
+        coinsData.put("BOX", "ContentBox");
+        coinsData.put("XIN", "Infinity Economics");
+        coinsData.put("APIS", "APIS");
+        coinsData.put("BMX", "Bitmart Coin");
+        coinsData.put("PST", "Primas");
+        coinsData.put("SWFTC", "SwftCoin");
+        coinsData.put("WPR", "WePower");
+        coinsData.put("VIBE", "VOIBEHub");
+        coinsData.put("LYM", "Lympo");
+        coinsData.put("EVX", "Everex");
+        coinsData.put("VET", "Vechain");
+        coinsData.put("VIB", "Viberate");
+        coinsData.put("MDA", "Moeda");
+        coinsData.put("ONT", "Ontology");
+        coinsData.put("OKB", "Okex");
+        coinsData.put("ETF", "EthereumFog");
+
+
+
+
+
 
 
 
@@ -86,53 +133,6 @@ public class CryptoCurrency {
     public static LinkedHashMap<String, String> getCryptoCurrencyData() {
         return coinsData;
     }
-
-    public static String convertToBase(String units, String coinCode) {
-        double smallestUnit;
-        switch (coinCode) {
-            case BTC:
-                smallestUnit = SATOSHI;
-                break;
-            case BCH:
-                smallestUnit = SATOSHI;
-                break;
-            case ETH:
-                smallestUnit = WEI;
-                break;
-            case DASH:
-                smallestUnit = SATOSHI;
-                break;
-            case LTC:
-                smallestUnit = SATOSHI;
-                break;
-            case DOGE:
-                smallestUnit = SATOSHI;
-                break;
-            case XRP:
-                smallestUnit = SATOSHI;
-                break;
-
-
-            default:
-                smallestUnit = 1;
-
-
-        }
-
-        BigDecimal smallUnit = new BigDecimal(String.valueOf(smallestUnit));
-        BigDecimal unitsDecimal = new BigDecimal(units);
-        BigDecimal result = unitsDecimal.divide(smallUnit);
-        if (result.compareTo(new BigDecimal(0)) == 0) return "0";
-        return result.stripTrailingZeros().toPlainString();
-    }
-
-    public static String calculateCoinWorth(String coinCount, double coinRate, String currencyCode) {
-        if (coinRate == -1) return PRICE_NOT_AVAILABLE;
-        BigDecimal rate = new BigDecimal(String.valueOf(coinRate)).multiply(new BigDecimal(coinCount));
-        BigDecimal roundOff = rate.setScale(2, BigDecimal.ROUND_HALF_EVEN);
-        return roundOff.toPlainString() + " " + currencyCode;
-    }
-
 
     public static String getCoinName(String coinCode) {
         return coinsData.get(coinCode);

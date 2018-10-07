@@ -6,7 +6,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.helper.SharedPreferenceManager;
+import com.codit.cryptoconverter.util.Constants;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,20 +24,19 @@ import java.util.Map;
  * Created by Sreejith on 28-Nov-17.
  */
 
-public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
+public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     SharedPreferenceManager helper;
-    Preference defaultCurrency, rateUs, shareApp, contactUs, donate, credits;
-    onCurrencyPreferenceClickListener listener;
+    Preference cryptoWatch, rateUs, shareApp, contactUs, credits;
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
 
         switch (preference.getKey()) {
-            case SharedPreferenceManager.DEFAULT_CURRENCY:
-                listener.onCurrencyPreferenceClick();
+            case SharedPreferenceManager.CRYPTO_WATCH:
+                launchPlayStore(Constants.CRYPTO_WATCH_WALLET_PACKAGE);
                 return true;
             case SharedPreferenceManager.RATE_APP:
-                launchPlayStore();
+                launchPlayStore(getContext().getPackageName());
                 return true;
             case SharedPreferenceManager.SHARE_APP:
                 shareApp();
@@ -45,10 +44,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case SharedPreferenceManager.CONTACT_US:
                 sendFeedbackMail();
                 return true;
-            case SharedPreferenceManager.DONATE:
-                showDonationDialog();
-                return true;
-
             case SharedPreferenceManager.CREDITS:
                 showCreditsDialog();
                 return true;
@@ -64,60 +59,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         helper = new SharedPreferenceManager(getActivity().getApplicationContext());
         Log.d("preference", "onCreatePreferences: " + getPreferenceScreen().getPreference(0).getKey());
 
-        defaultCurrency = getPreferenceManager().findPreference(SharedPreferenceManager.DEFAULT_CURRENCY);
+        cryptoWatch = getPreferenceManager().findPreference(SharedPreferenceManager.CRYPTO_WATCH);
         rateUs = getPreferenceManager().findPreference(SharedPreferenceManager.RATE_APP);
         shareApp = getPreferenceManager().findPreference(SharedPreferenceManager.SHARE_APP);
         contactUs = getPreferenceManager().findPreference(SharedPreferenceManager.CONTACT_US);
-        donate = getPreferenceManager().findPreference(SharedPreferenceManager.DONATE);
         credits = getPreferenceManager().findPreference(SharedPreferenceManager.CREDITS);
 
 
-        defaultCurrency.setOnPreferenceClickListener(this);
+        cryptoWatch.setOnPreferenceClickListener(this);
         rateUs.setOnPreferenceClickListener(this);
         shareApp.setOnPreferenceClickListener(this);
         contactUs.setOnPreferenceClickListener(this);
-        donate.setOnPreferenceClickListener(this);
         credits.setOnPreferenceClickListener(this);
 
-        intiSummaries();
-
 
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        listener = (onCurrencyPreferenceClickListener) context;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    private void intiSummaries() {
-        defaultCurrency.setSummary(helper.getDefaultCurrency());
-
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        switch (s) {
-            case SharedPreferenceManager.DEFAULT_CURRENCY:
-                defaultCurrency.setSummary(helper.getDefaultCurrency());
-                break;
-        }
-    }
-
-    private void launchPlayStore() {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + getContext().getPackageName()));
+    private void launchPlayStore(String appPackage) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackage));
         startActivity(intent);
     }
 
@@ -131,7 +90,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     private void sendFeedbackMail() {
         Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "codit.apps@gmail.com", null));
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback: CryptoConverter");
         startActivity(Intent.createChooser(intent, "Send feedback"));
 
     }
@@ -184,7 +143,4 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 .show();
     }
 
-    public interface onCurrencyPreferenceClickListener {
-        void onCurrencyPreferenceClick();
-    }
 }

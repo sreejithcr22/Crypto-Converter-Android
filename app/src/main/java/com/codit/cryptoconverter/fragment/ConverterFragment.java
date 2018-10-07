@@ -1,8 +1,10 @@
 package com.codit.cryptoconverter.fragment;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,8 +22,10 @@ import com.codit.cryptoconverter.asynctask.ConvertAndDisplayParams;
 import com.codit.cryptoconverter.db.FavPairsDB;
 import com.codit.cryptoconverter.dialog.FavPairsListDialog;
 import com.codit.cryptoconverter.dialog.SpinnerDialog;
+import com.codit.cryptoconverter.helper.SharedPreferenceManager;
 import com.codit.cryptoconverter.listener.FavDialogOperationsListener;
 import com.codit.cryptoconverter.listener.FavPairDBOperationsListener;
+import com.codit.cryptoconverter.listener.FragmentTransactionListener;
 import com.codit.cryptoconverter.model.CalculatorParams;
 import com.codit.cryptoconverter.model.FavouritePair;
 import com.codit.cryptoconverter.model.SpinnerItem;
@@ -31,6 +35,8 @@ import com.codit.cryptoconverter.util.Util;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static com.codit.cryptoconverter.util.Util.extractCurrencyCode;
 
 public class ConverterFragment extends Fragment {
     private static final String TAG = ConverterFragment.class.getSimpleName();
@@ -42,7 +48,7 @@ public class ConverterFragment extends Fragment {
     private BigDecimal result = null;
     private Button no0, no1, no2, no3, no4, no5, no6, no7, no8, no9,
             opAdd, opSub, opDiv, opEquals, opMultiply, numDot, opClear;
-    private ImageButton opBackSpace, btnAddFav, btnShowFavList, btnSwitchCurrencies;
+    private ImageButton opBackSpace, btnAddFav, btnShowFavList, btnSwitchCurrencies, btnMarket, btnMore;
     private FavDialogOperationsListener favDialogOperationsListener = new FavDialogOperationsListener() {
         @Override
         public void onFavPairSelected(FavouritePair pair) {
@@ -57,6 +63,9 @@ public class ConverterFragment extends Fragment {
 
         }
     };
+    private FragmentTransactionListener fragmentTransactionListener;
+
+
     private View.OnClickListener onCurrencyTextviewClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -78,17 +87,12 @@ public class ConverterFragment extends Fragment {
                 //rest selection indicator and tags
                 printResult();
 
-
-                //edit1.setBackground(getResources().getDrawable(R.drawable.currency_label_normal_bg));
-                //edit2.setBackground(getResources().getDrawable(R.drawable.currency_label_normal_bg));
                 converterLayoutHolder1.setBackground(getResources().getDrawable(R.drawable.converter_holder_normal_bg));
                 converterLayoutHolder2.setBackground(getResources().getDrawable(R.drawable.converter_holder_normal_bg));
                 edit1.setTag(R.id.IS_CURRENT_SELECTED_FIELD, false);
                 edit2.setTag(R.id.IS_CURRENT_SELECTED_FIELD, false);
             }
 
-            //highlight selection and set selected tag
-            //v.setBackground(getResources().getDrawable(R.drawable.converter_layout_holder_selected_bg));
             if (v.getId() == R.id.edit1) {
                 converterLayoutHolder1.setBackground(getResources().getDrawable(R.drawable.converter_layout_holder_selected_bg));
             } else {
@@ -235,6 +239,11 @@ public class ConverterFragment extends Fragment {
         @Override
         public void onClick(View v) {
             showFavListDialog();
+            SharedPreferenceManager manager = new SharedPreferenceManager(getContext());
+            if (!manager.isFavDeleteMessageShown()) {
+                Toast.makeText(getActivity(), R.string.fav_long_press_delete_toast_message, Toast.LENGTH_LONG).show();
+                manager.setFavDeleteMessageShown(true);
+            }
         }
     };
 
@@ -259,9 +268,12 @@ public class ConverterFragment extends Fragment {
             String convertFromCurrency = getConvertFromCurrency();
             String convertToCurrency = getConvertToCurrency();
 
-            if (convertFromCurrency != null && convertToCurrency != null) {
-                addFavPair(convertFromCurrency, convertToCurrency);
-
+            if (v.getTag(R.id.BTN_ADD_FAV_TAG) == Boolean.FALSE) {
+                Log.d(TAG, "onClick: add");
+                FavPairsDB.getInstance(getContext()).addFavPair(new FavouritePair(convertFromCurrency, convertToCurrency), listener);
+            } else {
+                Log.d(TAG, "onClick: delete");
+                FavPairsDB.getInstance(getContext()).deleteFavPair(new FavouritePair(convertFromCurrency, convertToCurrency), listener);
             }
         }
     };
@@ -297,6 +309,29 @@ public class ConverterFragment extends Fragment {
         }
     };
 
+    private View.OnClickListener onMarketBtnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new MarketFragment(), Constants.FRAGMENT_MARKET).addToBackStack(Constants.FRAGMENT_MARKET).commit();
+            if (fragmentTransactionListener != null) {
+                fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_MARKET);
+            }
+        }
+    };
+
+    private View.OnClickListener onMoreBtnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new SettingsFragment(), Constants.FRAGMENT_SETTINGS).addToBackStack(null).commit();
+            if (fragmentTransactionListener != null) {
+                fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_SETTINGS);
+            }
+
+        }
+    };
+
     private void showFavListDialog() {
         FavPairsListDialog favPairsListDialog = FavPairsListDialog.newInstance(favDialogOperationsListener);
         favPairsListDialog.show(getFragmentManager(), null);
@@ -310,7 +345,7 @@ public class ConverterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        Log.d(TAG, "onCreateView: ");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_converter, container, false);
         converterLayoutHolder1 = view.findViewById(R.id.converter_layout_holder_1);
@@ -354,6 +389,8 @@ public class ConverterFragment extends Fragment {
         btnAddFav = view.findViewById(R.id.btn_add_fav);
         btnShowFavList = view.findViewById(R.id.view_favs);
         btnSwitchCurrencies = view.findViewById(R.id.btn_switch);
+        btnMarket = view.findViewById(R.id.btn_market);
+        btnMore = view.findViewById(R.id.btn_more);
 
         no0.setOnClickListener(onCalcDigitButtonClickListener);
         no1.setOnClickListener(onCalcDigitButtonClickListener);
@@ -377,13 +414,33 @@ public class ConverterFragment extends Fragment {
         btnAddFav.setOnClickListener(onAddFavBtnClickListener);
         btnShowFavList.setOnClickListener(onShowFavBtnClickListener);
         btnSwitchCurrencies.setOnClickListener(onSwitchCurrenciesBtnCliclListener);
-
-        //check if default currencies are added to favs
-        FavPairsDB.getInstance(getActivity()).isFavPairExist(new FavouritePair(getConvertFromCurrency(), getConvertToCurrency()), listener);
+        btnMarket.setOnClickListener(onMarketBtnClickListener);
+        btnMore.setOnClickListener(onMoreBtnClickListener);
 
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (fragmentTransactionListener != null) {
+            fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_CONVERTER);
+        }
+        //check if default currencies are added to favs
+        FavPairsDB.getInstance(getActivity()).isFavPairExist(new FavouritePair(getConvertFromCurrency(), getConvertToCurrency()), listener);
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        Log.d(TAG, "onAttach: ");
+        super.onAttach(context);
+        try {
+            fragmentTransactionListener = (FragmentTransactionListener) context;
+        } catch (ClassCastException e) {
+            Log.e(TAG, "onAttach: " + e.toString());
+        }
+    }
 
     private TextView getCurrentSelectedField() {
         if (edit1 != null && edit2 != null) {
@@ -418,17 +475,25 @@ public class ConverterFragment extends Fragment {
             return;
         }
         if (textViewId == currency1.getId()) {
-            Log.d(TAG, "extractCurrencyCode: returned: " + extractCurrencyCode(currency2.getText().toString()));
-            if (extractCurrencyCode(currency2.getText().toString()).equals(item.getCurrencyCode())) {
+            String extractedCurrencyCode = extractCurrencyCode(currency2.getText().toString());
+            Log.d(TAG, "extractCurrencyCode: returned: " + extractedCurrencyCode);
+            if (extractedCurrencyCode.equals(item.getCurrencyCode())) {
                 Toast.makeText(getActivity(), getString(R.string.same_currency_value), Toast.LENGTH_SHORT).show();
+            } else if (Util.getCurrencyType(extractedCurrencyCode).equals(Constants.CURRENCY_TYPE_FIAT)
+                    && Util.getCurrencyType(item.getCurrencyCode()).equals(Constants.CURRENCY_TYPE_FIAT)) {
+                Toast.makeText(getActivity(), R.string.both_fiat_currency, Toast.LENGTH_SHORT).show();
             } else {
                 currency1.setText(Util.getCurrencyName(item.getCurrencyCode()) + " (" + item.getCurrencyCode() + ")");
                 isCurrencyUpdated = true;
             }
         } else {
-            Log.d(TAG, "extractCurrencyCode: returned: " + extractCurrencyCode(currency1.getText().toString()));
-            if (extractCurrencyCode(currency1.getText().toString()).equals(item.getCurrencyCode())) {
+            String extractedCurrencyCode = extractCurrencyCode(currency1.getText().toString());
+            Log.d(TAG, "extractCurrencyCode: returned: " + extractedCurrencyCode);
+            if (extractedCurrencyCode.equals(item.getCurrencyCode())) {
                 Toast.makeText(getActivity(), getString(R.string.same_currency_value), Toast.LENGTH_SHORT).show();
+            } else if (Util.getCurrencyType(extractedCurrencyCode).equals(Constants.CURRENCY_TYPE_FIAT)
+                    && Util.getCurrencyType(item.getCurrencyCode()).equals(Constants.CURRENCY_TYPE_FIAT)) {
+                Toast.makeText(getActivity(), R.string.both_fiat_currency, Toast.LENGTH_SHORT).show();
             } else {
                 currency2.setText(Util.getCurrencyName(item.getCurrencyCode()) + " (" + item.getCurrencyCode() + ")");
                 isCurrencyUpdated = true;
@@ -593,6 +658,7 @@ public class ConverterFragment extends Fragment {
         public void onFavPairAdded() {
             Toast.makeText(getContext(), "Added to favourites !", Toast.LENGTH_SHORT).show();
             btnAddFav.setColorFilter(Color.RED);
+            btnAddFav.setTag(R.id.BTN_ADD_FAV_TAG, true);
         }
 
         @Override
@@ -607,12 +673,14 @@ public class ConverterFragment extends Fragment {
 
         @Override
         public void onFavPairDeleted() {
-
+            Toast.makeText(getContext(), "Removed from favourites !", Toast.LENGTH_SHORT).show();
+            btnAddFav.setColorFilter(Color.BLACK);
+            btnAddFav.setTag(R.id.BTN_ADD_FAV_TAG, false);
         }
 
         @Override
         public void onFavPairDeleteFailed(String message) {
-
+            Log.d(TAG, "onFavPairDeleteFailed: " + message);
         }
 
         @Override
@@ -620,21 +688,14 @@ public class ConverterFragment extends Fragment {
             Log.d(TAG, "onIsPairExistResult: " + String.valueOf(isExist));
             if (isExist) {
                 btnAddFav.setColorFilter(Color.RED);
+                btnAddFav.setTag(R.id.BTN_ADD_FAV_TAG, true);
             } else {
                 btnAddFav.setColorFilter(Color.BLACK);
+                btnAddFav.setTag(R.id.BTN_ADD_FAV_TAG, false);
             }
         }
     };
 
-    private void addFavPair(String convertFromCurrency, String convertToCurrency) {
-
-        FavPairsDB.getInstance(getActivity()).addFavPair(new FavouritePair(convertFromCurrency, convertToCurrency), listener);
-    }
-
-    private String extractCurrencyCode(String textViewString) {
-        String arr[] = textViewString.split("\\(");
-        return arr[1].substring(0, arr[1].length() - 1);
-    }
 
 }
 
