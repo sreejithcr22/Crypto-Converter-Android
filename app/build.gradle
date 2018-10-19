@@ -6,8 +6,8 @@ android {
         applicationId "com.codit.cryptoconverter"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.2"
     }
     buildTypes {
         release {
@@ -19,20 +19,20 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.0'
-    implementation 'com.android.support:design:27.1.0'
-    implementation 'com.android.support:preference-v7:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:preference-v7:27.1.1'
 
-    implementation 'com.android.support:preference-v7:27.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:support-vector-drawable:27.1.0'
-    implementation 'com.android.support:support-v4:27.1.0'
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
-    compile "android.arch.lifecycle:extensions:1.1.0"
-    compile "android.arch.persistence.room:runtime:1.0.0"
-    annotationProcessor "android.arch.lifecycle:compiler:1.1.0"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation 'com.android.support:cardview-v7:27.1.0'
+    implementation 'com.android.support:preference-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support:support-vector-drawable:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation "android.arch.persistence.room:runtime:1.1.0"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.0"
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.android.support:cardview-v7:27.1.1'
 }
