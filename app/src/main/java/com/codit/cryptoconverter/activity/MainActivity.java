@@ -1,32 +1,37 @@
 package com.codit.cryptoconverter.activity;
 
 import android.app.ProgressDialog;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Configuration;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.codit.cryptoconverter.R;
+import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.fragment.ConverterFragment;
 import com.codit.cryptoconverter.fragment.MarketFragment;
 import com.codit.cryptoconverter.helper.SharedPreferenceManager;
 import com.codit.cryptoconverter.listener.FragmentTransactionListener;
+import com.codit.cryptoconverter.listener.MarketDbCallback;
 import com.codit.cryptoconverter.listener.OnCurrencySelectedListener;
 import com.codit.cryptoconverter.model.CoinPrices;
 import com.codit.cryptoconverter.model.SpinnerItem;
+import com.codit.cryptoconverter.receiver.ProgressReceiver;
 import com.codit.cryptoconverter.util.Connectivity;
 import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.CryptoCurrency;
@@ -45,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
     private Toolbar toolbar;
     private MenuItem currency;
     private MenuItem btnSearch;
+    private ProgressDialog progressDialog;
+    private ProgressReceiver progressReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,39 +64,8 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
         setSupportActionBar(toolbar);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ConverterFragment(), Constants.FRAGMENT_CONVERTER).commit();
+       setupProgressBar();
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int density = metrics.densityDpi;
-
-
-        String densityString = "cannot determine";
-        if (density == DisplayMetrics.DENSITY_XXHIGH) {
-
-            densityString = "xxhdpi";
-        } else if (density == DisplayMetrics.DENSITY_XHIGH) {
-            densityString = "xhdpi";
-
-        } else if (density == DisplayMetrics.DENSITY_HIGH) {
-            densityString = "hdpi";
-
-        } else if (density == DisplayMetrics.DENSITY_MEDIUM) {
-
-            densityString = "mdpi";
-        } else if (density == DisplayMetrics.DENSITY_LOW) {
-
-            densityString = "ldpi";
-        }
-
-
-        Configuration config = getResources().getConfiguration();
-
-
-        Log.d("dimens", "density= " + densityString);
-        Log.d("dimens", "small width= " + String.valueOf(config.smallestScreenWidthDp));
-        Log.d("dimens", "width x height " + String.valueOf(metrics.widthPixels) + " x " + String.valueOf(metrics.heightPixels));
-
-        showDbDownloadProgress();
     }
 
     @Override
@@ -231,29 +207,33 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
         }
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getResources().getString(R.string.progress_message));
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setCancelable(false);
+        progressDialog.setIndeterminate(false);
+
 
         MarketViewModel marketViewModel = ViewModelProviders.of(this).get(MarketViewModel.class);
         marketViewModel.getAllCoinPricesLive().observe(this, new Observer<List<CoinPrices>>() {
             @Override
             public void onChanged(@Nullable List<CoinPrices> updatedPrices) {
-                Log.d("showDbDownloadProgress", "onChanged: size=" + updatedPrices.size());
+                progressDialog.setProgress(50);
+                //Log.d("showDbDownloadProgress", "onChanged: size=" + updatedPrices.size()+", total = "+CryptoCurrency.getCryptoCurrencyData().size());
                 if (updatedPrices.size() == CryptoCurrency.getCryptoCurrencyData().size()) {
-                    Log.d("showDbDownloadProgress", "onChanged: prices size=" + String.valueOf(updatedPrices.get(updatedPrices.size() - 1).getPrices().size()));
+                    Log.d("showDbDownloadProgress", "onChanged: prices size=" + updatedPrices.get(updatedPrices.size() - 1).getPrices().size());
                     if (updatedPrices.get(updatedPrices.size() - 1).getPrices().size() ==
                             CryptoCurrency.getCryptoCurrencyData().size() + FiatCurrency.getCurrencyData().size()) {
                         sharedPreferenceManager.setIsInitialDataDownloaded(true);
-                        if (progressDialog != null && progressDialog.isShowing()) {
+                        if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                             Toast.makeText(getApplicationContext(), getResources().getString(R.string.data_download_success), Toast.LENGTH_SHORT).show();
                         }
                     }
-                } else if (progressDialog != null && !progressDialog.isShowing()) {
+                } else if (!progressDialog.isShowing()) {
                     progressDialog.show();
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (progressDialog != null && progressDialog.isShowing()) {
+                            if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                                 Toast.makeText(getApplicationContext(), getResources().getString(R.string.data_download_failure), Toast.LENGTH_SHORT).show();
                             }
@@ -264,5 +244,31 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (progressReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        }
+    }
 
+    public void setupProgressBar() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getResources().getString(R.string.progress_message));
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(false);
+        progressDialog.setIndeterminate(false);
+        final Context context = this;
+        MarketDB.getInstance().getDbStatus(this, new MarketDbCallback() {
+            @Override
+            public void onDbStatus(boolean isEmpty) {
+                Log.d("setupProgressBar", "isEmpty = "+isEmpty);
+                if (isEmpty) {
+                    progressReceiver = new ProgressReceiver(progressDialog);
+                    LocalBroadcastManager.getInstance(context).registerReceiver(progressReceiver,
+                            new IntentFilter(ProgressReceiver.PROGRESS_ACTION));
+                }
+            }
+        });
+    }
 }

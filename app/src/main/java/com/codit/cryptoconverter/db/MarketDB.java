@@ -1,9 +1,13 @@
 package com.codit.cryptoconverter.db;
 
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+
+import com.codit.cryptoconverter.listener.MarketDbCallback;
 import com.codit.cryptoconverter.model.CoinPrices;
 
 import java.util.HashMap;
@@ -27,7 +31,7 @@ public class MarketDB {
         return marketDB;
     }
 
-    public int getIndexOf(String coinCode, List<CoinPrices> dbPricesList) {
+    private int getIndexOf(String coinCode, List<CoinPrices> dbPricesList) {
 
         for (int i = 0; i < dbPricesList.size(); i++) {
             CoinPrices prices = dbPricesList.get(i);
@@ -50,7 +54,9 @@ public class MarketDB {
             if (dbPricesList == null || dbPricesList.size() == 0 ||
                     MarketDB.getInstance().getIndexOf(entry.getKey(), dbPricesList) == -1) {
                 Log.d(TAG, "updateDB: add new coin - " + entry.getKey());
-                dbPricesList.add(new CoinPrices(entry.getKey(), entry.getValue()));
+                if (dbPricesList != null) {
+                    dbPricesList.add(new CoinPrices(entry.getKey(), entry.getValue()));
+                }
             } else {
 
                 int index = MarketDB.getInstance().getIndexOf(entry.getKey(), dbPricesList);
@@ -68,5 +74,23 @@ public class MarketDB {
 
     public LiveData<List<CoinPrices>> getAllCoinPricesLive(Context context) {
         return AppDatabase.getDatabase(context.getApplicationContext()).marketDao().getAllCoinPricesLive();
+    }
+
+    public void getDbStatus(final Context context, final MarketDbCallback callback) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MarketDao dao = AppDatabase.getDatabase(context).marketDao();
+                final boolean isEmpty = dao.getAllCoinPrices().isEmpty();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onDbStatus(isEmpty);
+                    }
+                });
+            }
+        });
+        thread.start();
     }
 }

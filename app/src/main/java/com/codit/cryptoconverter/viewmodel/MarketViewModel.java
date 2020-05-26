@@ -1,9 +1,10 @@
 package com.codit.cryptoconverter.viewmodel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 
 import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.model.CoinPrices;

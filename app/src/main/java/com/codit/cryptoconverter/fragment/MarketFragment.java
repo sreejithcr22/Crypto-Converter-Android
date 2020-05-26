@@ -1,27 +1,22 @@
 package com.codit.cryptoconverter.fragment;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.adapter.MarketRecyclerAdapter;
 import com.codit.cryptoconverter.listener.RecyclerviewSearchListener;
 import com.codit.cryptoconverter.model.CoinPrices;
-import com.codit.cryptoconverter.service.BaseService;
-import com.codit.cryptoconverter.service.FetchMarketDataService;
-import com.codit.cryptoconverter.util.Connectivity;
 import com.codit.cryptoconverter.viewmodel.MarketViewModel;
 
 import java.util.ArrayList;
@@ -29,10 +24,9 @@ import java.util.List;
 
 public class MarketFragment extends Fragment  implements RecyclerviewSearchListener{
 
-    RecyclerView marketRecyclerView;
-    MarketRecyclerAdapter marketRecyclerAdapter;
-    SwipeRefreshLayout swipeRefreshLayout;
-    List<CoinPrices> coinPricesList;
+    private RecyclerView marketRecyclerView;
+    private MarketRecyclerAdapter marketRecyclerAdapter;
+    private List<CoinPrices> coinPricesList;
     public MarketFragment() {
         // Required empty public constructor
     }
@@ -53,7 +47,6 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
 
         View rootView=inflater.inflate(R.layout.fragment_market, container, false);
         marketRecyclerView= rootView.findViewById(R.id.marketRecyclerView);
-        swipeRefreshLayout=rootView.findViewById(R.id.swiperefresh);
         return rootView;
 
     }
@@ -74,34 +67,14 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
         );
         marketRecyclerView.addItemDecoration(mDividerItemDecoration);
 
-        swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        Connectivity connectivity=new Connectivity(getContext());
-                        if(! connectivity.isConnected())
-                        {
-                            swipeRefreshLayout.setRefreshing(false);
-                            Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        Intent intent=new Intent(getContext(),FetchMarketDataService.class);
-                        intent.putExtra(BaseService.EXTRA_SHOULD_IGNORE_WALLET_REFRESH,true);
-                        getContext().startService(intent);
-                    }
-                }
-        );
 
 
         MarketViewModel marketViewModel= ViewModelProviders.of(this).get(MarketViewModel.class);
         marketViewModel.getAllCoinPricesLive().observe(MarketFragment.this, new Observer<List<CoinPrices>>() {
             @Override
             public void onChanged(@Nullable List<CoinPrices> updatedPrices) {
-
-                swipeRefreshLayout.setRefreshing(false);
+                assert updatedPrices != null;
                 marketRecyclerAdapter.updateData(updatedPrices);
-
-
             }
         });
     }

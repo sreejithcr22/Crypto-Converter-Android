@@ -6,11 +6,14 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.helper.FetchDataRunnable;
 import com.codit.cryptoconverter.http.ApiClient;
 import com.codit.cryptoconverter.http.MarketApi;
 import com.codit.cryptoconverter.listener.FetchDataCallback;
+import com.codit.cryptoconverter.receiver.ProgressReceiver;
 import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.CryptoCurrency;
 import com.codit.cryptoconverter.util.FiatCurrency;
@@ -73,6 +76,7 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
             //start api calls
             if (apiCallQueue.size() != 0) {
                 Log.d(TAG, "FetchMarketDataService: api call start");
+                sendProgress(0);
                 handler.post(apiCallQueue.get(0));
             }
 
@@ -147,6 +151,8 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
 
     @Override
     public void onCurrentApiCallFinished(int qPos) {
+        Log.d(TAG, "q size = "+apiCallQueue.size()+", pos = "+qPos);
+        sendProgress(qPos+1);
         if (apiCallQueue.size() == qPos + 1) {
             handlerThread.quit();
             Log.d(TAG, "FetchMarketDataService: api call finish");
@@ -158,6 +164,19 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
     @Override
     public void executeApiCall(String fsysUrl, String tosysUrl) {
         MarketDB.getInstance().updateDB(getApplicationContext(), fetchDataFromServer(fsysUrl, tosysUrl));
+    }
+
+    private void sendProgress(int qPos) {
+        int progress = 0;
+        if (apiCallQueue == null || apiCallQueue.size() == 0) {
+            progress = 100;
+        } else {
+
+            progress = Math.round((((float) qPos / apiCallQueue.size()) * 100));
+        }
+        Intent intent = new Intent(ProgressReceiver.PROGRESS_ACTION);
+        intent.putExtra(ProgressReceiver.CURRENT_PROGRESS, progress);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
 

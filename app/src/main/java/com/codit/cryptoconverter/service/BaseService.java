@@ -2,7 +2,8 @@ package com.codit.cryptoconverter.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.codit.cryptoconverter.db.MarketDao;
 import com.codit.cryptoconverter.util.Connectivity;
