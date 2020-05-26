@@ -31,5 +31,9 @@
             android:name=".service.FetchMarketDataService"
             android:exported="false" />
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7040172378865675~9993208507"/>
+
     </application>
 </manifest>

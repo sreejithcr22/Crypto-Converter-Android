@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.codit.cryptoconverter.R;
+import com.codit.cryptoconverter.ad.AdHelper;
 import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.fragment.ConverterFragment;
 import com.codit.cryptoconverter.fragment.MarketFragment;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
         setSupportActionBar(toolbar);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ConverterFragment(), Constants.FRAGMENT_CONVERTER).commit();
-       setupProgressBar();
+        setupProgressBar();
 
     }
 
@@ -267,6 +268,8 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
                     progressReceiver = new ProgressReceiver(progressDialog);
                     LocalBroadcastManager.getInstance(context).registerReceiver(progressReceiver,
                             new IntentFilter(ProgressReceiver.PROGRESS_ACTION));
+                } else {
+                    AdHelper.getInstance(getApplicationContext()).showAd(context);
                 }
             }
         });

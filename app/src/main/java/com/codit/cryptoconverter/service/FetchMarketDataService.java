@@ -50,7 +50,7 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
             int fsysIterator = (int) Math.ceil(Double.valueOf(String.valueOf(CryptoCurrency.getCryptoCurrencyData().size())) / Double.valueOf(Constants.API_CALL_FSYS_ARG_LIMIT));
             int tosysIterator = (int) Math.ceil(Double.valueOf(String.valueOf(FiatCurrency.getCurrencyData().size())) / Double.valueOf(Constants.API_CALL_TOSYS_ARG_LIMIT));
             int tosysCryptoIterator = (int) Math.ceil(Double.valueOf(String.valueOf(CryptoCurrency.getCryptoCurrencyData().size())) / Double.valueOf(Constants.API_CALL_TOSYS_ARG_LIMIT));
-            Log.d(TAG, "fsysIterator=" + String.valueOf(fsysIterator) + ", tosysIterator=" + String.valueOf(tosysIterator) + ", tosysCryptoIterator=" + tosysCryptoIterator);
+            Log.d(TAG, "fsysIterator=" + fsysIterator + ", tosysIterator=" + tosysIterator + ", tosysCryptoIterator=" + tosysCryptoIterator);
 
             for (int i = 1; i <= fsysIterator; i++) {
                 int fsysStartIndex = (i * Constants.API_CALL_FSYS_ARG_LIMIT) - Constants.API_CALL_FSYS_ARG_LIMIT;
@@ -60,14 +60,12 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
 
                     int tosysStartIndex = (j * Constants.API_CALL_TOSYS_ARG_LIMIT) - Constants.API_CALL_TOSYS_ARG_LIMIT;
                     int tosysEndIndex = (j * Constants.API_CALL_TOSYS_ARG_LIMIT - 1);
-                    //handler.postDelayed(new FetchDataRunnable(fsysStartIndex,fsysEndIndex,tosysStartIndex,tosysEndIndex,Constants.CURRENCY_TYPE_FIAT), Constants.API_CALL_DELAY);
                     apiCallQueue.add((new FetchDataRunnable(fsysStartIndex, fsysEndIndex, tosysStartIndex, tosysEndIndex, Constants.CURRENCY_TYPE_FIAT, apiCallQueue.size(), this, getApplicationContext())));
                 }
 
                 for (int k = 1; k <= tosysCryptoIterator; k++) {
                     int tosysStartIndex = (k * Constants.API_CALL_TOSYS_ARG_LIMIT) - Constants.API_CALL_TOSYS_ARG_LIMIT;
                     int tosysEndIndex = (k * Constants.API_CALL_TOSYS_ARG_LIMIT - 1);
-                    //handler.postDelayed(new FetchDataRunnable(fsysStartIndex,fsysEndIndex,tosysStartIndex,tosysEndIndex,Constants.CURRENCY_TYPE_CRYPTO), Constants.API_CALL_DELAY);
                     apiCallQueue.add((new FetchDataRunnable(fsysStartIndex, fsysEndIndex, tosysStartIndex, tosysEndIndex, Constants.CURRENCY_TYPE_CRYPTO, apiCallQueue.size(), this, getApplicationContext())));
 
                 }
@@ -107,47 +105,6 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
             return null;
         }
     }
-
-    /*void updateDB(LinkedHashMap<String, HashMap<String, Double>> fetchedPricesList)
-    {
-        if(fetchedPricesList==null) return;
-
-        MarketDao dao= AppDatabase.getDatabase(getApplicationContext()).marketDao();
-        List<CoinPrices> dbPricesList = dao.getAllCoinPricesLive();
-        if(dbPricesList!= null && dbPricesList.size()>0) {
-            //Log.d(TAG, "updateDB:getAllCoinPricesLive returned values ");
-            for (CoinPrices dbPrices: dbPricesList) {
-                Log.d(TAG, "updateDB: before update--"+dbPrices.getCoinCode()+"--"+dbPrices.getJsonPricesString());
-                HashMap<String, Double> dbPricesMap = dbPrices.getPrices();
-                if (dbPricesMap!=null && fetchedPricesList.containsKey(dbPrices.getCoinCode()) && fetchedPricesList.get(dbPrices.getCoinCode())!=null) {
-                    HashMap<String, Double> fetchedPricesMap = fetchedPricesList.get(dbPrices.getCoinCode());
-                    dbPricesMap.putAll(fetchedPricesMap);
-                    dbPrices.setPrices(dbPricesMap);
-                    Log.d(TAG, "updateDB: after update--"+dbPrices.getCoinCode()+"--"+dbPrices.getJsonPricesString());
-                }
-                else {
-                    Log.d(TAG, "updateDB: some null");
-                }
-
-            }
-
-            dao.addCoinPrices(dbPricesList);
-
-        } else {
-            Log.d(TAG, "updateDB:first data fetch ");
-            List<CoinPrices> coinPricesList=new ArrayList<>();
-            for(Map.Entry<String, HashMap<String, Double>> entry : fetchedPricesList.entrySet()) {
-                coinPricesList.add(new CoinPrices(entry.getKey(),entry.getValue()));
-                dao.addCoinPrices(coinPricesList);
-        }
-
-
-
-        }
-
-
-    }*/
-
 
     @Override
     public void onCurrentApiCallFinished(int qPos) {
