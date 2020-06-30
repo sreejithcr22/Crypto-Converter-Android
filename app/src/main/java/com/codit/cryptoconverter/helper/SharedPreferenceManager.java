@@ -14,9 +14,9 @@ public class SharedPreferenceManager {
     public static final String CONTACT_US = "settings_contact_us";
     public static final String SHARE_APP = "settings_share_app";
     public static final String CREDITS = "settings_credits";
-    public static final String SESSION_COUNT = "session_count";
-    public static final String FAV_DELETE_MESSAGE_SHOWN = "fav_delete_message_shown";
-    public static final String IS_INITIAL_DATA_DOWNLOADED = "is_data_downloaded";
+    private static final String SESSION_COUNT = "session_count";
+    private static final String FAV_DELETE_MESSAGE_SHOWN = "fav_delete_message_shown";
+    private static final String IS_INITIAL_DATA_DOWNLOADED = "is_data_downloaded";
 
     SharedPreferences preferenceManager;
 
@@ -42,10 +42,21 @@ public class SharedPreferenceManager {
     }
 
     public void setIsInitialDataDownloaded(boolean isInitialDataDownloaded) {
-        preferenceManager.edit().putBoolean(IS_INITIAL_DATA_DOWNLOADED, isInitialDataDownloaded).commit();
+        preferenceManager.edit().putBoolean(IS_INITIAL_DATA_DOWNLOADED, isInitialDataDownloaded).apply();
     }
 
     public boolean isInitialDataDownloaded() {
         return preferenceManager.getBoolean(IS_INITIAL_DATA_DOWNLOADED, false);
     }
+
+    public void setSessionCount(long count) {
+        preferenceManager.edit().putLong(SESSION_COUNT, count).apply();
+    }
+
+    public long getSessionCount() {
+        return preferenceManager.getLong(SESSION_COUNT, 0);
+    }
+
+
+
 }

@@ -2,6 +2,7 @@ package com.codit.cryptoconverter.ad;
 
 import android.content.Context;
 
+import com.codit.cryptoconverter.helper.SharedPreferenceManager;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -33,10 +34,13 @@ public class AdHelper {
     }
 
     public void showAd(Context context) {
-        mInterstitialAd = new InterstitialAd(context);
-        mInterstitialAd.setAdUnitId(AD_ID);
-        mInterstitialAd.setAdListener(adListener);
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        SharedPreferenceManager manager = new SharedPreferenceManager(context);
+        if (manager.getSessionCount() > 1) {
+            mInterstitialAd = new InterstitialAd(context);
+            mInterstitialAd.setAdUnitId(AD_ID);
+            mInterstitialAd.setAdListener(adListener);
+            mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        }
     }
 
 

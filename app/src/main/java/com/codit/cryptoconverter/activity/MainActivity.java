@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         sharedPreferenceManager = new SharedPreferenceManager(getApplicationContext());
+        sharedPreferenceManager.setSessionCount(sharedPreferenceManager.getSessionCount() + 1);
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.title_converter));
         setSupportActionBar(toolbar);

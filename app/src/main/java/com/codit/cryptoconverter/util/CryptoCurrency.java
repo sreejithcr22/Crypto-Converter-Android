@@ -117,15 +117,9 @@ public class CryptoCurrency {
         coinsData.put("ONT", "Ontology");
         coinsData.put("OKB", "Okex");
         coinsData.put("ETF", "EthereumFog");
-
-
-
-
-
-
-
-
-
+        coinsData.put("LINK", "Chainlink");
+        coinsData.put("BSV", "Bitcoin SV");
+        coinsData.put("XTZ", "Tezos");
 
 
     }

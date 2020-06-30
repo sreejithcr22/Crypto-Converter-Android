@@ -50,6 +50,9 @@ static {
     currencyData.put("PKR", "Pakistani Rupee");
     currencyData.put("NOK", "Norwegian Krone");
     currencyData.put("JOD", "Jordanian Dinar");
+    currencyData.put("BRL", "Brazilian real");
+    currencyData.put("VEF", "Venezuelan bolívar");
+    currencyData.put("AED", "United Arab Emirates Dirham");
 
 
 }
