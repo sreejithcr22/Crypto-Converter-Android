@@ -32,6 +32,7 @@ import com.codit.cryptoconverter.db.FavPairsDB;
 import com.codit.cryptoconverter.dialog.FavPairsListDialog;
 import com.codit.cryptoconverter.dialog.SpinnerDialog;
 import com.codit.cryptoconverter.helper.SharedPreferenceManager;
+import com.codit.cryptoconverter.listener.ConverterFragmentCallback;
 import com.codit.cryptoconverter.listener.FavDialogOperationsListener;
 import com.codit.cryptoconverter.listener.FavPairDBOperationsListener;
 import com.codit.cryptoconverter.listener.FragmentTransactionListener;
@@ -52,7 +53,7 @@ import java.util.List;
 import static com.codit.cryptoconverter.receiver.ProgressReceiver.CURRENT_PROGRESS;
 import static com.codit.cryptoconverter.util.Util.extractCurrencyCode;
 
-public class ConverterFragment extends Fragment {
+public class ConverterFragment extends Fragment implements ConverterFragmentCallback {
     private static final String TAG = ConverterFragment.class.getSimpleName();
     private boolean operatorOn = false;
     private LinearLayout converterLayoutHolder1, converterLayoutHolder2;
@@ -334,7 +335,7 @@ public class ConverterFragment extends Fragment {
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new MarketFragment(), Constants.FRAGMENT_MARKET).addToBackStack(Constants.FRAGMENT_MARKET).commit();
             if (fragmentTransactionListener != null) {
-                fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_MARKET);
+                fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_MARKET, ConverterFragment.this);
             }
         }
     };
@@ -462,7 +463,7 @@ public class ConverterFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (fragmentTransactionListener != null) {
-            fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_CONVERTER);
+            fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_CONVERTER, this);
         }
         //check if default currencies are added to favs
         FavPairsDB.getInstance(getActivity()).isFavPairExist(new FavouritePair(getConvertFromCurrency(), getConvertToCurrency()), listener);
@@ -740,6 +741,20 @@ public class ConverterFragment extends Fragment {
             }
         }
     };
+
+    @Override
+    public void pasteClipboard(BigDecimal value) {
+        clearFields();
+        TextView selected = getCurrentSelectedField();
+        TextView output = getOutputField();
+        if (selected != null && output != null) {
+            selected.append(value.toPlainString());
+            value1 = new StringBuffer(selected.getText().toString());
+            result = new BigDecimal(value1.toString());
+            updateOutput(output, result);
+        }
+
+    }
 
     private class ProgressReceiver extends BroadcastReceiver {
 

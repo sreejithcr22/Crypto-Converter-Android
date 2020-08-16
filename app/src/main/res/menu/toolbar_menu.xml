@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:orderInCategory="200"
         android:id="@+id/search"
         android:icon="@drawable/ic_search"
+        android:orderInCategory="200"
         android:title="Search"
-        app:showAsAction="always|collapseActionView"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
     <item
-        android:orderInCategory="100"
         android:id="@+id/change_currency"
+        android:orderInCategory="100"
         android:title="Change currency"
         app:showAsAction="always|collapseActionView" />
 
@@ -18,6 +18,12 @@
         android:id="@+id/more"
         android:title="More"
         app:showAsAction="never" />
+
+    <item
+        android:icon="@drawable/ic_paste"
+        android:id="@+id/paste"
+        android:title="Paste"
+        app:showAsAction="always" />
 
 
 </menu>
