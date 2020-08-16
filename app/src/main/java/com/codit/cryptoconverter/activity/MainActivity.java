@@ -4,12 +4,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,6 +29,7 @@ import com.codit.cryptoconverter.ad.AdHelper;
 import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.fragment.ConverterFragment;
 import com.codit.cryptoconverter.fragment.MarketFragment;
+import com.codit.cryptoconverter.fragment.SettingsFragment;
 import com.codit.cryptoconverter.helper.SharedPreferenceManager;
 import com.codit.cryptoconverter.listener.FragmentTransactionListener;
 import com.codit.cryptoconverter.listener.MarketDbCallback;
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
     private Toolbar toolbar;
     private MenuItem currency;
     private MenuItem btnSearch;
+    private MenuItem btnMore;
     private ProgressDialog progressDialog;
     private ProgressReceiver progressReceiver;
 
@@ -76,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
             case R.id.change_currency:
                 showChangeCurrencyDialog();
                 return true;
+            case R.id.more:
+                onMoreMenuClicked();
+                return true;
         }
 
         return false;
@@ -89,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
         currency = menu.findItem(R.id.change_currency);
         currency.setTitle(sharedPreferenceManager.getDefaultCurrency());
         btnSearch = menu.findItem(R.id.search);
+        btnMore = menu.findItem(R.id.more);
         searchView = (SearchView) btnSearch.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -166,11 +175,13 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
                     Log.d(getLocalClassName(), "onFragmentTransaction: converter visible");
                     toolbar.setTitle(getResources().getString(R.string.title_converter));
                     hideToolbarMenuItems();
+                    btnMore.setVisible(true);
                     return;
                 case Constants.FRAGMENT_MARKET:
                     Log.d(getLocalClassName(), "onFragmentTransaction: market visible");
                     toolbar.setTitle(getResources().getString(R.string.title_market));
                     showToolbarMenuItems();
+                    btnMore.setVisible(true);
                     return;
                 case Constants.FRAGMENT_SETTINGS:
                     Log.d(getLocalClassName(), "onFragmentTransaction: settings visible");
@@ -202,49 +213,6 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
         }
     }
 
-    private void showDbDownloadProgress() {
-        if (sharedPreferenceManager.isInitialDataDownloaded() || !new Connectivity(getApplicationContext()).isConnected()) {
-            return;
-        }
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getResources().getString(R.string.progress_message));
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setCancelable(false);
-        progressDialog.setIndeterminate(false);
-
-
-        MarketViewModel marketViewModel = ViewModelProviders.of(this).get(MarketViewModel.class);
-        marketViewModel.getAllCoinPricesLive().observe(this, new Observer<List<CoinPrices>>() {
-            @Override
-            public void onChanged(@Nullable List<CoinPrices> updatedPrices) {
-                progressDialog.setProgress(50);
-                //Log.d("showDbDownloadProgress", "onChanged: size=" + updatedPrices.size()+", total = "+CryptoCurrency.getCryptoCurrencyData().size());
-                if (updatedPrices.size() == CryptoCurrency.getCryptoCurrencyData().size()) {
-                    Log.d("showDbDownloadProgress", "onChanged: prices size=" + updatedPrices.get(updatedPrices.size() - 1).getPrices().size());
-                    if (updatedPrices.get(updatedPrices.size() - 1).getPrices().size() ==
-                            CryptoCurrency.getCryptoCurrencyData().size() + FiatCurrency.getCurrencyData().size()) {
-                        sharedPreferenceManager.setIsInitialDataDownloaded(true);
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.data_download_success), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } else if (!progressDialog.isShowing()) {
-                    progressDialog.show();
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.data_download_failure), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }, 3 * 60 * 1000);
-                }
-            }
-        });
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -273,5 +241,14 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
                 }
             }
         });
+    }
+
+    private void onMoreMenuClicked() {
+        toolbar.setTitle(getResources().getString(R.string.title_settings));
+        hideToolbarMenuItems();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new SettingsFragment(), Constants.FRAGMENT_SETTINGS).addToBackStack(null).commit();
+        btnMore.setVisible(false);
+
     }
 }

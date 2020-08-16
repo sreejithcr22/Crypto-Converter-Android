@@ -43,6 +43,9 @@
 
     <dimen name="card_view_elevation">3dp</dimen>
     <dimen name="card_view_corner_radius">3dp</dimen>
+    <dimen name="donut_width_height">44dp</dimen>
+    <dimen name="donut_stroke_width">3dp</dimen>
+    <dimen name="donut_text_size">12sp</dimen>
 
 
 </resources>

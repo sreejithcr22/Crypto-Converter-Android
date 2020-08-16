@@ -4,7 +4,9 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/tools">
 
 
     <LinearLayout
@@ -48,14 +50,28 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
-
-            <ImageButton
+            <LinearLayout
+                android:gravity="center"
+                android:tint="@color/calc_button_text_selector"
                 android:background="@drawable/calc_button_selector"
-                android:src="@drawable/ic_more"
-                android:id="@+id/btn_more"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
+
+                <com.github.lzyzsd.circleprogress.DonutProgress
+                    app:donut_text_color="@color/color_black"
+                    app:donut_finished_color="@android:color/holo_green_light"
+                    android:id="@+id/donut_progress"
+                    android:layout_width="@dimen/donut_width_height"
+                    android:layout_height="@dimen/donut_width_height"
+                    app:donut_finished_stroke_width="@dimen/donut_stroke_width"
+                    app:donut_unfinished_stroke_width="@dimen/donut_stroke_width"
+                    app:donut_text_size="@dimen/donut_text_size"
+                    custom:donut_progress="30"/>
+
+
+            </LinearLayout>
+
 
 
         </LinearLayout>

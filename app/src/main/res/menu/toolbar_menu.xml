@@ -13,4 +13,11 @@
         android:id="@+id/change_currency"
         android:title="Change currency"
         app:showAsAction="always|collapseActionView" />
+
+    <item
+        android:id="@+id/more"
+        android:title="More"
+        app:showAsAction="never" />
+
+
 </menu>

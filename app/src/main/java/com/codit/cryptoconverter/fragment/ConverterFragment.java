@@ -1,21 +1,29 @@
 package com.codit.cryptoconverter.fragment;
 
 
+import android.animation.ObjectAnimator;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.codit.cryptoconverter.R;
 import com.codit.cryptoconverter.asynctask.ConvertAndDisplay;
@@ -30,13 +38,18 @@ import com.codit.cryptoconverter.listener.FragmentTransactionListener;
 import com.codit.cryptoconverter.model.CalculatorParams;
 import com.codit.cryptoconverter.model.FavouritePair;
 import com.codit.cryptoconverter.model.SpinnerItem;
+import com.codit.cryptoconverter.receiver.ProgressReceiver;
+import com.codit.cryptoconverter.service.FetchMarketDataService;
 import com.codit.cryptoconverter.util.Calculator;
+import com.codit.cryptoconverter.util.Connectivity;
 import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.Util;
+import com.github.lzyzsd.circleprogress.DonutProgress;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.codit.cryptoconverter.receiver.ProgressReceiver.CURRENT_PROGRESS;
 import static com.codit.cryptoconverter.util.Util.extractCurrencyCode;
 
 public class ConverterFragment extends Fragment {
@@ -49,7 +62,12 @@ public class ConverterFragment extends Fragment {
     private BigDecimal result = null;
     private Button no0, no1, no2, no3, no4, no5, no6, no7, no8, no9,
             opAdd, opSub, opDiv, opEquals, opMultiply, numDot, opClear;
-    private ImageButton opBackSpace, btnAddFav, btnShowFavList, btnSwitchCurrencies, btnMarket, btnMore;
+    private ImageButton opBackSpace, btnAddFav, btnShowFavList, btnSwitchCurrencies, btnMarket;
+    private ImageButton btnReload;
+    private DonutProgress donutProgress;
+    private ProgressReceiver progressReceiver;
+    private int currentProgress = 0;
+
     private FavDialogOperationsListener favDialogOperationsListener = new FavDialogOperationsListener() {
         @Override
         public void onFavPairSelected(FavouritePair pair) {
@@ -321,13 +339,23 @@ public class ConverterFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener onMoreBtnClickListener = new View.OnClickListener() {
+    private View.OnClickListener onReload = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new SettingsFragment(), Constants.FRAGMENT_SETTINGS).addToBackStack(null).commit();
-            if (fragmentTransactionListener != null) {
-                fragmentTransactionListener.onFragmentTransaction(Constants.FRAGMENT_SETTINGS);
+            try {
+                Connectivity connectivity = new Connectivity(getContext());
+                if (!connectivity.isConnected()) {
+                    Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Intent intent = new Intent(getContext(), FetchMarketDataService.class);
+                getActivity().startService(intent);
+                btnReload.setVisibility(View.GONE);
+                donutProgress.setVisibility(View.VISIBLE);
+                Toast.makeText(getContext(), "Updating prices...", Toast.LENGTH_SHORT).show();
+
+            } catch (Exception e) {
+                Log.e(TAG, "initSession: " + e.getMessage());
             }
 
         }
@@ -391,7 +419,9 @@ public class ConverterFragment extends Fragment {
         btnShowFavList = view.findViewById(R.id.view_favs);
         btnSwitchCurrencies = view.findViewById(R.id.btn_switch);
         btnMarket = view.findViewById(R.id.btn_market);
-        btnMore = view.findViewById(R.id.btn_more);
+        btnReload = view.findViewById(R.id.btn_reload);
+        donutProgress = view.findViewById(R.id.donut_progress);
+
 
         no0.setOnClickListener(onCalcDigitButtonClickListener);
         no1.setOnClickListener(onCalcDigitButtonClickListener);
@@ -416,7 +446,14 @@ public class ConverterFragment extends Fragment {
         btnShowFavList.setOnClickListener(onShowFavBtnClickListener);
         btnSwitchCurrencies.setOnClickListener(onSwitchCurrenciesBtnCliclListener);
         btnMarket.setOnClickListener(onMarketBtnClickListener);
-        btnMore.setOnClickListener(onMoreBtnClickListener);
+        btnReload.setOnClickListener(onReload);
+        donutProgress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Updating prices...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         return view;
     }
@@ -429,6 +466,13 @@ public class ConverterFragment extends Fragment {
         }
         //check if default currencies are added to favs
         FavPairsDB.getInstance(getActivity()).isFavPairExist(new FavouritePair(getConvertFromCurrency(), getConvertToCurrency()), listener);
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
 
     }
 
@@ -697,6 +741,50 @@ public class ConverterFragment extends Fragment {
         }
     };
 
+    private class ProgressReceiver extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int progress = intent.getIntExtra(CURRENT_PROGRESS, 100);
+            Log.d("ProgressReceiver", "fragment progress = " + progress);
+            manageProgress(progress);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        manageProgress(currentProgress);
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        progressReceiver = new ProgressReceiver();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(progressReceiver,
+                new IntentFilter(com.codit.cryptoconverter.receiver.ProgressReceiver.PROGRESS_ACTION));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(progressReceiver);
+    }
+
+    private void manageProgress(int progress) {
+        currentProgress = progress;
+        if (progress >= 100) {
+            donutProgress.setVisibility(View.GONE);
+            btnReload.setVisibility(View.VISIBLE);
+        } else {
+            if (donutProgress.getVisibility() == View.GONE) {
+                donutProgress.setVisibility(View.VISIBLE);
+            }
+            btnReload.setVisibility(View.GONE);
+            donutProgress.setProgress(progress);
+            donutProgress.setText(progress + "%");
+        }
+    }
 }
 
