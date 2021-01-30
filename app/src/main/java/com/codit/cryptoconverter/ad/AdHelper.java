@@ -13,7 +13,7 @@ public class AdHelper {
 
     private static AdHelper instance;
     private InterstitialAd mInterstitialAd;
-    private static final String AD_ID = "ca-app-pub-7040172378865675/5951705920";
+    private static final String AD_ID = "a-app-pub-3940256099942544/1033173712";
     private static final String TEST_ID = "ca-app-pub-3940256099942544/1033173712";
     private AdListener adListener = new AdListener() {
         @Override
