@@ -1,0 +1,10 @@
+# Local-only, never commit
+keystore.properties
+*.jks
+*.keystore
+upload_certificate.pem
+local.properties
+# Build outputs
+build/
+.gradle/
+app/build/
