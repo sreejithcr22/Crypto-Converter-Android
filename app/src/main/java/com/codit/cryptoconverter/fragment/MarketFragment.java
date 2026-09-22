@@ -8,13 +8,12 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codit.cryptoconverter.R;
-import com.codit.cryptoconverter.ad.AdHelper;
 import com.codit.cryptoconverter.adapter.MarketRecyclerAdapter;
 import com.codit.cryptoconverter.listener.RecyclerviewSearchListener;
 import com.codit.cryptoconverter.model.CoinPrices;
@@ -39,7 +38,6 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
         super.onCreate(savedInstanceState);
 
         coinPricesList=new ArrayList<>();
-        AdHelper.getInstance(getActivity()).showAd(getContext());
     }
 
     @Override
@@ -71,7 +69,7 @@ public class MarketFragment extends Fragment  implements RecyclerviewSearchListe
 
 
 
-        MarketViewModel marketViewModel= ViewModelProviders.of(this).get(MarketViewModel.class);
+        MarketViewModel marketViewModel= new ViewModelProvider(this).get(MarketViewModel.class);
         marketViewModel.getAllCoinPricesLive().observe(getViewLifecycleOwner(), new Observer<List<CoinPrices>>() {
             @Override
             public void onChanged(@Nullable List<CoinPrices> updatedPrices) {

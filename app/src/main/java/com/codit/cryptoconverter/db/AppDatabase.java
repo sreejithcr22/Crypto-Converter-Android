@@ -12,7 +12,7 @@ import com.codit.cryptoconverter.model.FavouritePair;
 /**
  * Created by Sreejith on 22-Nov-17.
  */
-@Database(entities = {CoinPrices.class, FavouritePair.class}, version = 1)
+@Database(entities = {CoinPrices.class, FavouritePair.class}, version = 1, exportSchema = false)
 
 public abstract class AppDatabase extends RoomDatabase{
 

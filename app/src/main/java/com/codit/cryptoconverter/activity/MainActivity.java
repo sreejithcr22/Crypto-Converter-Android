@@ -24,11 +24,10 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.codit.cryptoconverter.R;
-import com.codit.cryptoconverter.ad.AdHelper;
 import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.fragment.ConverterFragment;
 import com.codit.cryptoconverter.fragment.MarketFragment;
@@ -86,16 +85,16 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.change_currency:
-                showChangeCurrencyDialog();
-                return true;
-            case R.id.more:
-                onMoreMenuClicked();
-                return true;
-            case R.id.paste:
-                onPasteMenuClicked();
-                return true;
+        int id = item.getItemId();
+        if (id == R.id.change_currency) {
+            showChangeCurrencyDialog();
+            return true;
+        } else if (id == R.id.more) {
+            onMoreMenuClicked();
+            return true;
+        } else if (id == R.id.paste) {
+            onPasteMenuClicked();
+            return true;
         }
 
         return false;
@@ -281,8 +280,6 @@ public class MainActivity extends AppCompatActivity implements OnCurrencySelecte
                     progressReceiver = new ProgressReceiver(progressDialog);
                     LocalBroadcastManager.getInstance(context).registerReceiver(progressReceiver,
                             new IntentFilter(ProgressReceiver.PROGRESS_ACTION));
-                } else {
-                    AdHelper.getInstance(getApplicationContext()).showAd(context);
                 }
             }
         });
