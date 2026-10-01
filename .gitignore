@@ -9,3 +9,6 @@ local.properties
 build/
 .gradle/
 app/build/
+
+# macOS
+.DS_Store
