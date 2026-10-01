@@ -16,9 +16,12 @@ import com.codit.cryptoconverter.util.Connectivity;
 public class App extends Application {
     private static final String TAG = App.class.getSimpleName();
 
+    public com.codit.cryptoconverter.di.AppContainer container;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        container = new com.codit.cryptoconverter.di.AppContainer(this);
         //Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
         initSession();
     }

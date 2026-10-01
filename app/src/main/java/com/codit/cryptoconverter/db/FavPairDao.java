@@ -9,6 +9,8 @@ import com.codit.cryptoconverter.model.FavouritePair;
 
 import java.util.List;
 
+import kotlinx.coroutines.flow.Flow;
+
 import static androidx.room.OnConflictStrategy.FAIL;
 
 @Dao
@@ -16,6 +18,9 @@ public interface FavPairDao {
 
     @Query("select * from FavouritePair")
     List<FavouritePair> getAllFavPairs();
+
+    @Query("select * from FavouritePair")
+    Flow<List<FavouritePair>> observeAllFavPairs();
 
     @Insert(onConflict = FAIL)
     long addFavPair(FavouritePair pair);
@@ -26,4 +31,8 @@ public interface FavPairDao {
     @Query("Select * from FavouritePair where convertFromCurrency=:convertFrom and convertToCurrency=:convertTo " +
             "or convertFromCurrency=:convertTo and convertToCurrency=:convertFrom")
     List<FavouritePair> isPairExist(String convertFrom, String convertTo);
+
+    @Query("Select * from FavouritePair where convertFromCurrency=:convertFrom and convertToCurrency=:convertTo " +
+            "or convertFromCurrency=:convertTo and convertToCurrency=:convertFrom")
+    Flow<List<FavouritePair>> observeIsPairExist(String convertFrom, String convertTo);
 }
