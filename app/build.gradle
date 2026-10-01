@@ -6,15 +6,26 @@ if (keystorePropsFile.exists()) {
     keystoreProps.load(new FileInputStream(keystorePropsFile))
 }
 
+def apiKeysFile = rootProject.file("apikeys.properties")
+def apiKeys = new Properties()
+if (apiKeysFile.exists()) {
+    apiKeysFile.withInputStream { apiKeys.load(it) }
+}
+def cryptoCompareApiKey = apiKeys.getProperty("cryptocompareApiKey", "")
+
 android {
     namespace "com.codit.cryptoconverter"
     compileSdk 36
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId "com.codit.cryptoconverter"
         minSdk 24
         targetSdk 36
         versionCode 14
         versionName "1.9"
+        buildConfigField "String", "CRYPTOCOMPARE_API_KEY", "\"${cryptoCompareApiKey}\""
     }
     signingConfigs {
         release {
@@ -58,6 +69,7 @@ dependencies {
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.lzyzsd:circleprogress:1.2.1'
 }
