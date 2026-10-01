@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,6 +24,24 @@ import com.codit.cryptoconverter.presentation.navigation.bottomNavItems
 import com.codit.cryptoconverter.presentation.viewmodel.ConverterViewModel
 import com.codit.cryptoconverter.presentation.viewmodel.MarketViewModel
 import com.codit.cryptoconverter.presentation.viewmodel.SettingsViewModel
+
+/**
+ * Single entry point for ALL tab navigation (bottom bar and in-content
+ * buttons). Identical NavOptions everywhere: pop back to the start
+ * destination (saving state), single-top, restore state. Tapping the
+ * active tab is an explicit no-op. This keeps exactly one entry per tab
+ * on the back stack, so the bottom bar always reflects the visible screen.
+ */
+private fun navigateToTab(navController: NavHostController, route: String) {
+    if (navController.currentDestination?.route == route) return
+    navController.navigate(route) {
+        navController.graph.startDestinationRoute?.let { startRoute ->
+            popUpTo(startRoute) { saveState = true }
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
 
 @Composable
 fun MainScreen(container: AppContainer) {
@@ -38,13 +57,7 @@ fun MainScreen(container: AppContainer) {
                 bottomNavItems.forEach { screen ->
                     NavigationBarItem(
                         selected = currentRoute == screen.route,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
+                        onClick = { navigateToTab(navController, screen.route) },
                         icon = { Icon(screen.icon, contentDescription = screen.label) },
                         label = { Text(screen.label) }
                     )
@@ -63,7 +76,7 @@ fun MainScreen(container: AppContainer) {
                 )
                 ConverterScreen(
                     viewModel = vm,
-                    onNavigateToMarket = { navController.navigate(Screen.Market.route) },
+                    onNavigateToMarket = { navigateToTab(navController, Screen.Market.route) },
                     snackbarHostState = snackbarHostState
                 )
             }
