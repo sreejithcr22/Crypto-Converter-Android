@@ -9,6 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object NetworkModule {
     private const val BASE_URL_MARKET = "https://min-api.cryptocompare.com/"
+    private const val BASE_URL_COINGECKO = "https://api.coingecko.com/api/v3/"
     private const val TIMEOUT_SECONDS = 60L
 
     fun provideOkHttp(): OkHttpClient {
@@ -32,6 +33,16 @@ object NetworkModule {
 
     fun provideMarketApi(retrofit: Retrofit = provideRetrofit()): MarketApiService =
         retrofit.create(MarketApiService::class.java)
+
+    fun provideCoinGeckoApi(
+        okHttp: OkHttpClient = provideOkHttp()
+    ): CoinGeckoApiService =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL_COINGECKO)
+            .client(okHttp)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(CoinGeckoApiService::class.java)
 
     fun apiKeyOrNull(): String? {
         val key = try {
