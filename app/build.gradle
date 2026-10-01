@@ -29,8 +29,8 @@ android {
         applicationId "com.codit.cryptoconverter"
         minSdk 24
         targetSdk 36
-        versionCode 14
-        versionName "1.9"
+        versionCode 15
+        versionName "1.10"
         buildConfigField "String", "CRYPTOCOMPARE_API_KEY", "\"${cryptoCompareApiKey}\""
     }
     signingConfigs {
