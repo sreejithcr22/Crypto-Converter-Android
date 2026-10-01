@@ -34,8 +34,11 @@ public class App extends Application {
                 Toast.makeText(getApplicationContext(), R.string.no_internet, Toast.LENGTH_LONG).show();
                 return;
             }
-            Intent intent = new Intent(this, FetchMarketDataService.class);
-            startService(intent);
+            // Legacy FetchMarketDataService disabled: refresh is now owned by
+            // MarketRepository (Compose ViewModels, on-demand with pacing).
+            // Keeping the old service auto-start would double API load and
+            // exhaust the CryptoCompare free-tier rate limit.
+            Log.d(TAG, "initSession: legacy FetchMarketDataService auto-start disabled (Compose refresh on demand)");
         } catch (Exception e) {
             Log.e(TAG, "initSession: " + e.getMessage());
         }
