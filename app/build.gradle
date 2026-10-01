@@ -29,7 +29,7 @@ android {
         applicationId "com.codit.cryptoconverter"
         minSdk 24
         targetSdk 36
-        versionCode 15
+        versionCode 16
         versionName "1.10"
         buildConfigField "String", "CRYPTOCOMPARE_API_KEY", "\"${cryptoCompareApiKey}\""
     }
@@ -44,7 +44,8 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
