@@ -1,5 +1,6 @@
 # Local-only, never commit
 keystore.properties
+apikeys.properties
 *.jks
 *.keystore
 upload_certificate.pem
