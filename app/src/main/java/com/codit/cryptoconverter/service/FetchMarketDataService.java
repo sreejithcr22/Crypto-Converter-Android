@@ -8,6 +8,7 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.codit.cryptoconverter.BuildConfig;
 import com.codit.cryptoconverter.db.MarketDB;
 import com.codit.cryptoconverter.helper.FetchDataRunnable;
 import com.codit.cryptoconverter.http.ApiClient;
@@ -17,7 +18,11 @@ import com.codit.cryptoconverter.receiver.ProgressReceiver;
 import com.codit.cryptoconverter.util.Constants;
 import com.codit.cryptoconverter.util.CryptoCurrency;
 import com.codit.cryptoconverter.util.FiatCurrency;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -82,25 +87,57 @@ public class FetchMarketDataService extends IntentService implements FetchDataCa
         }
     }
 
+    String getApiKeyOrNull() {
+        String apiKey = BuildConfig.CRYPTOCOMPARE_API_KEY;
+        if (apiKey == null || apiKey.trim().isEmpty()) return null; // Retrofit omits null query params
+        return apiKey.trim();
+    }
+
     LinkedHashMap<String, HashMap<String, Double>> fetchDataFromServer(String fsysUrl, String tosysUrl) {
         Retrofit retrofit = ApiClient.getInstance().getMarketClient();
         MarketApi marketApi = retrofit.create(MarketApi.class);
-        Call<LinkedHashMap<String, HashMap<String, Double>>> call;
+        Call<JsonElement> call;
 
 
-        call = marketApi.getAllCoinPrices(fsysUrl, tosysUrl);
+        String apiKey = getApiKeyOrNull();
+        if (apiKey == null) {
+            Log.w(TAG, "fetchDataFromServer: missing CRYPTOCOMPARE_API_KEY (apikeys.properties)");
+        }
+        call = marketApi.getAllCoinPrices(fsysUrl, tosysUrl, apiKey);
         Log.d(TAG, "fetchDataFromServer: url=" + call.request().url().toString());
         try {
 
-            Response<LinkedHashMap<String, HashMap<String, Double>>> response = call.execute();
-            if (response.isSuccessful()) {
-
-                return response.body();
-            } else {
-
+            Response<JsonElement> response = call.execute();
+            if (!response.isSuccessful()) {
+                String errBody = null;
+                try { errBody = response.errorBody() != null ? response.errorBody().string() : null; } catch (Exception ignored) {}
+                Log.w(TAG, "fetchDataFromServer: failed code=" + response.code() + " body=" + errBody);
                 return null;
             }
+            JsonElement body = response.body();
+            if (body == null || body.isJsonNull()) {
+                Log.w(TAG, "fetchDataFromServer: empty body");
+                return null;
+            }
+            // CryptoCompare returns HTTP 200 with {"Response":"Error","Message":...} on failures
+            // (e.g. rate limit). Detect and skip instead of crashing Gson parsing.
+            if (body.isJsonObject() && body.getAsJsonObject().has("Response")) {
+                String status = body.getAsJsonObject().get("Response").getAsString();
+                if ("Error".equalsIgnoreCase(status)) {
+                    String msg = body.getAsJsonObject().has("Message")
+                            ? body.getAsJsonObject().get("Message").getAsString() : "unknown error";
+                    Log.w(TAG, "fetchDataFromServer: API error: " + msg);
+                    return null;
+                }
+            }
+            Type mapType = new TypeToken<LinkedHashMap<String, HashMap<String, Double>>>() {}.getType();
+            LinkedHashMap<String, HashMap<String, Double>> prices = new Gson().fromJson(body, mapType);
+            if (prices == null || prices.isEmpty()) {
+                Log.w(TAG, "fetchDataFromServer: no prices in body=" + body.toString().substring(0, Math.min(300, body.toString().length())));
+            }
+            return prices;
         } catch (Exception e) {
+            Log.w(TAG, "fetchDataFromServer: exception=" + e);
             e.printStackTrace();
             return null;
         }
