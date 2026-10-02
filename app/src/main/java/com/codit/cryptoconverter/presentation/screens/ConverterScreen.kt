@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -87,14 +90,15 @@ fun ConverterScreen(
             )
         }
 
-        // From / To cards
-        Row(
+        // From / To cards (stacked vertically so converted
+        // values have the full width to display)
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CurrencyCard(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 label = "From",
                 code = state.fromCurrency,
                 name = state.currencies.find { it.code == state.fromCurrency }?.name
@@ -106,7 +110,7 @@ fun ConverterScreen(
                 Icon(Icons.Filled.Refresh, contentDescription = "Swap")
             }
             CurrencyCard(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 label = "To",
                 code = state.toCurrency,
                 name = state.currencies.find { it.code == state.toCurrency }?.name
@@ -211,29 +215,66 @@ private fun CalculatorPad(
     onClear: () -> Unit,
     onBackspace: () -> Unit
 ) {
+    // iPhone-like palette: soft gray digits, orange operators.
+    val digitContainer = MaterialTheme.colorScheme.surfaceVariant
+    val digitContent = MaterialTheme.colorScheme.onSurfaceVariant
+    val utilContainer = MaterialTheme.colorScheme.secondaryContainer
+    val utilContent = MaterialTheme.colorScheme.onSecondaryContainer
+    val operatorContainer = Color(0xFFFF9F0A)
+    val operatorContent = Color.White
+    val operators = setOf("÷", "*", "-", "+", "=")
+
     val buttons = listOf("7", "8", "9", "÷", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+")
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-            Button(onClick = onClear, modifier = Modifier.weight(1f)) { Text("C") }
-            Button(onClick = onBackspace, modifier = Modifier.weight(1f)) { Text("⌫") }
+            Button(
+                onClick = onClear,
+                modifier = Modifier.weight(1f),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = utilContainer,
+                    contentColor = utilContent
+                )
+            ) { Text("C") }
+            Button(
+                onClick = onBackspace,
+                modifier = Modifier.weight(1f),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = utilContainer,
+                    contentColor = utilContent
+                )
+            ) { Text("⌫") }
         }
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.weight(1f)
         ) {
             items(buttons) { label ->
-                Button(
-                    onClick = {
-                        when (label) {
-                            "=" -> onEquals()
-                            "+", "-", "*", "÷" -> onOperator(label)
-                            else -> onDigit(label.first())
-                        }
-                    }
+                val isOperator = label in operators
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(label, fontSize = 18.sp)
+                    Button(
+                        onClick = {
+                            when (label) {
+                                "=" -> onEquals()
+                                "+", "-", "*", "÷" -> onOperator(label)
+                                else -> onDigit(label.first())
+                            }
+                        },
+                        modifier = Modifier.size(72.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isOperator) operatorContainer else digitContainer,
+                            contentColor = if (isOperator) operatorContent else digitContent
+                        )
+                    ) {
+                        Text(label, fontSize = 20.sp)
+                    }
                 }
             }
         }
